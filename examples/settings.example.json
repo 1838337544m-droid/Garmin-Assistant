@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "timezone": "Asia/Shanghai",
+  "goal_distance_km": 10,
+  "goal_minutes": 60
+}

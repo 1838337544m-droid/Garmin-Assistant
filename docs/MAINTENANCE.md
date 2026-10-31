@@ -1,0 +1,52 @@
+# 不定期更新、发布和回滚
+
+## 用户更新
+
+配置、密钥、数据库和扩展都在个人数据目录，源码更新不覆盖。
+需要备份时先退出 MCP，用 `doctor` 确认目录，再复制该目录。
+
+在原克隆目录，确认没有自行修改受版本控制的文件：
+
+```sh
+git status
+git pull --ff-only
+python -m pip install -e .
+garmin-assistant --version
+garmin-assistant doctor
+```
+
+上面的 Python/命令须替换为安装用的 `.venv` 路径。重启 AI 客户端。
+若存在个人源码修改，先另存分支或自行处理，不用 reset/强制覆盖。
+普通扩展应通过 `add-function`，无需编辑仓库文件。
+
+## 维护者发版
+
+1. 修改代码与文档，更新 `CHANGELOG.md` 和两个版本位置：`pyproject.toml`
+   与 `src/garmin_assistant/__init__.py`。版本必须一致。
+2. 执行 `pytest`、发布文件扫描、构建，检查核心编号与恢复操作。
+3. 提交并推送；等待 Windows/macOS/Linux CI 全通过。
+4. 打 `vX.Y.Z` 标签并推送；`release.yml` 构建源码包和 wheel，附 SHA256，
+   通过 GitHub CLI 创建名为“Garmin 助手（API）版本 vX.Y.Z”的 Release。
+5. 分享仓库首页或 Releases/latest 链接，用户始终能找到当前版本和说明。
+
+```sh
+python -m pytest -q
+python scripts/check_release.py
+python -m build
+git add src tests docs README.md CHANGELOG.md pyproject.toml scripts .github
+git commit -m "Release vX.Y.Z"
+git push
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+本项目没有自动向 PyPI 发布，也没有要求用户自动执行远程更新脚本。
+GitHub release workflow 仅需仓库自带的 GITHUB_TOKEN，不需要保存个人密钥。
+
+## 兼容与回滚
+
+1. 补丁版本修复问题；次版本增加兼容功能；改变数据格式或核心契约需主版本说明。
+2. 当前 settings/menu schema_version 为 1；未知版本应报错而不是清空偏好。
+3. 保留旧版本标签和 Release。回滚前备份数据，不承诺新数据格式可由旧版读取。
+4. 可在新的目录克隆旧标签，另建 `.venv`，用副本数据测试后再切换客户端。
+5. 不自动删除用户自定义工作流，不重排核心编号，也不把扩展写入源码。
