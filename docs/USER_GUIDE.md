@@ -2,27 +2,117 @@
 
 ## 1. 首次准备
 
-安装 Python 3.12 或更新版本与 Git。每位用户在自己的 Garmin Connect
-[Personal API 页面](https://connect.garmin.com/app/settings/personalApiToken)
-创建个人密钥；不要使用维护者或其他人的密钥。
+安装 Python 3.12 或更新版本与 Git。下面的“命令”是复制到电脑终端执行的文字，
+不是发给豆包、GPT 或 Claude 的聊天内容。终端就是 Windows PowerShell，
+或 macOS/Linux 的“终端”应用。
+
+每位用户需要自己的 Garmin **个人 API 密钥**。它是一长串字符，
+不是 Garmin 登录密码，也不是邮箱验证码。获取方法：
+
+1. 在浏览器登录你自己的 Garmin Connect 账号。
+2. 打开 [Personal API 页面](https://connect.garmin.com/app/settings/personalApiToken)。
+3. 选择 **Create Key（创建密钥）**，阅读条款、选择有效期并确认创建。
+4. 复制网页刚显示的整串密钥。密钥只显示一次，请保存在自己的安全位置。
+5. 暂时不要把密钥粘贴到聊天中，后面会有专门的隐藏输入步骤。
+
+不要使用维护者或其他人的密钥，也不需要把自己的密钥发给维护者。
 
 默认时区 UTC。请通过 `init` 设置自己的 IANA 时区，例如中国
 `Asia/Shanghai`、迪拜 `Asia/Dubai`。目标可自行修改；不会更改核心菜单。
 
 ## 2. 安装（Windows PowerShell）
 
+### 第一步：打开输入命令的窗口
+
+按键盘 **Windows 键**，输入 `PowerShell`，打开 **Windows PowerShell**。
+看到类似 `PS ... >` 的提示符后，就可以输入命令。
+普通用户权限即可，不必以管理员身份运行。
+
+以下每行命令都要**单独复制、粘贴、按回车**。等这一行运行结束，
+再次出现 `PS ... >` 后，再执行下一行。代码框旁的复制按钮可能复制整个框，
+新手可以用鼠标只选中一行复制。不要复制代码框的边框、行号或 `PS ... >`。
+
+### 第二步：下载项目并安装
+
+依次执行下面四行。`cd` 表示进入刚下载的项目文件夹；安装时输出很多文字是正常现象。
+
 ```powershell
 git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
 cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
+```
+
+如果提示 `python` 找不到，先确认 Python 已安装；也可用已安装的
+`py -3.12 -m venv .venv` 代替上面的第三行。提示 `git` 找不到则需先安装 Git。
+若提示项目文件夹已存在，不要重复下载，进入你已有的项目文件夹后继续。
+
+### 第三步：设置你的时区和目标
+
+中国用户复制这一行后按回车：
+
+```powershell
 .\.venv\Scripts\garmin-assistant.exe init --timezone Asia/Shanghai --goal-km 10 --goal-minutes 60
+```
+
+迪拜用户把 `Asia/Shanghai` 改为 `Asia/Dubai`。这里的 `10` 和 `60` 表示
+目标 10 公里、60 分钟，可按自己的目标修改。看到输出中有 `timezone` 和
+`goal` 就表示设置已写入；它还没有开始读取 Garmin 数据。
+
+### 第四步：输入个人密钥（最容易误解的一步）
+
+**先只运行下面这一行，不要连同下一步的检查命令一起粘贴：**
+
+```powershell
 .\.venv\Scripts\garmin-assistant.exe auth
+```
+
+按回车后，PowerShell 会显示：
+
+```text
+Garmin Personal API key (hidden):
+```
+
+这句话的意思是：**现在程序正等待你输入 Garmin 个人 API 密钥。**
+
+1. 回到 Garmin 网页或你自己的安全保存位置，复制整串个人密钥。
+2. 切回这个 PowerShell 窗口，在提示后的光标处按 **Ctrl+V** 粘贴。
+   如果该终端不支持 Ctrl+V，可尝试右键粘贴。
+3. **屏幕不会显示密钥，也不会出现圆点或星号，这是正常的隐藏输入，
+   不是程序卡住，也不是没有粘贴成功。** 不要因为没显示字符就反复粘贴。
+4. 粘贴一次后，按 **回车** 提交。不加引号，不输入 `API.txt` 文件名，
+   也不把密钥接在 `auth` 命令后面。
+5. 输出中看到 `"saved": true`，表示密钥已保存在你电脑上。
+   **这只表示保存成功，还需要下一步验证密钥能否连接 Garmin。**
+
+如果粘贴错了或不确定是否重复粘贴，按 **Ctrl+C** 取消，再运行一次
+`auth`，重新复制整串密钥、粘贴一次并按回车。
+
+### 第五步：验证是否连接成功
+
+等保存完成、再次出现 `PS ... >` 后，才执行这一行：
+
+```powershell
 .\.venv\Scripts\garmin-assistant.exe doctor --live
 ```
 
-`auth` 在终端隐藏输入密钥；不把密钥粘贴到 AI 聊天或写入命令参数。
-若 `python` 不存在，可使用已安装的 `py -3.12` 创建虚拟环境。
+检查输出：
+
+| 看到的内容 | 意思和下一步 |
+|---|---|
+| `"key_configured": true` | 找到了密钥；单看这一项还不能确认联网成功 |
+| `"key_configured": false` | 没有找到密钥；在同一个系统用户和项目环境中重新运行 `auth` |
+| `"garmin_status": "ok"` 且 `"status": "ok"` | 已成功读取 Garmin，可以按平台手册连接 AI |
+| `"garmin_status": "no_data"` | 请求成功，但该日期没有可用记录；先同步手表，或稍后查其它日期 |
+| `authentication_failed` | 密钥被拒绝；检查是否过期/撤销，重新创建或重新运行 `auth` |
+| `garmin_fetch_failed` | 读取失败；可能是网络、密钥或 Garmin 服务问题，不能判断为连接成功 |
+
+完成后按 [豆包／GPT／Claude 接入说明](CLIENTS.md)连接你的 AI。
+**保存密钥不等于已经把工具安装进 AI 客户端。**
+
+以后换一个 PowerShell 窗口，要先进入这个项目文件夹再运行以 `.\.venv` 开头的命令。
+也可以在文件资源管理器打开项目文件夹，在地址栏输入 `powershell` 后按回车，
+这样新窗口会直接在项目文件夹中打开。
 
 ## 3. 安装（macOS/Linux）
 
@@ -32,12 +122,25 @@ cd garmin-assistant-api
 python3 -m venv .venv
 .venv/bin/python -m pip install -e .
 .venv/bin/garmin-assistant init --timezone Asia/Shanghai --goal-km 10 --goal-minutes 60
+```
+
+接着**单独**执行认证命令：
+
+```sh
 .venv/bin/garmin-assistant auth
+```
+
+看到 `Garmin Personal API key (hidden):` 后粘贴自己的整串密钥，再按回车。
+macOS 通常用 **Command+V**，Linux 终端通常用 **Ctrl+Shift+V**。
+密钥不会显示，也没有星号；不要重复粘贴。输出 `"saved": true` 后再单独验证：
+
+```sh
 .venv/bin/garmin-assistant doctor --live
 ```
 
 确认 `python3 --version` 至少 3.12。上述流程不要求激活虚拟环境。
-客户端下载路径和命令请使用 `client-config` 生成的绝对路径。
+验证结果的含义见 Windows 部分的表格；客户端路径请使用 `client-config`
+生成的绝对路径。密钥输入是在终端内进行，不是在 AI 聊天输入框中进行。
 
 ## 4. 功能菜单
 

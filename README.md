@@ -19,11 +19,28 @@ cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
 .\.venv\Scripts\garmin-assistant.exe init --timezone Asia/Shanghai
+```
+
+接下来**单独运行**：
+
+```powershell
 .\.venv\Scripts\garmin-assistant.exe auth
+```
+
+看到 `Garmin Personal API key (hidden):` 后，在 **PowerShell 窗口**
+按 **Ctrl+V** 粘贴你自己的整串个人密钥，再按 **回车**。
+**输入不会显示字符或星号，这是正常现象；只粘贴一次。**
+看到 `"saved": true` 只是保存成功，再单独运行连接检查：
+
+```powershell
 .\.venv\Scripts\garmin-assistant.exe doctor --live
 ```
 
-`auth` 隐藏输入你自己的个人密钥。默认目标为 10 公里/60 分钟，可在
+检查结果中 `"garmin_status": "ok"` 表示已成功读取 Garmin。不要把密钥
+粘贴到 AI 聊天中，也不要把 `auth` 和检查命令一起粘贴。
+不熟悉命令行请按[零基础分步说明](docs/USER_GUIDE.md#第四步输入个人密钥最容易误解的一步)操作。
+
+默认目标为 10 公里/60 分钟，可在
 `init` 中用 `--goal-km`、`--goal-minutes` 修改。请配置自己的时区（默认 UTC）。
 macOS/Linux 对应命令与说明见[用户手册](docs/USER_GUIDE.md)。
 
