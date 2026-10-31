@@ -24,7 +24,9 @@ JSON 配置只复制 `mcpServers` 内容，`note` 是说明，不是客户端配
 不要覆盖其它服务。Windows 通常为 `%APPDATA%/Claude/claude_desktop_config.json`，
 macOS 通常为 `~/Library/Application Support/Claude/claude_desktop_config.json`；
 以客户端“编辑配置”打开的实际文件为准，商店版目录可能不同。
-退出并重新打开客户端，检查服务状态，再说“显示原有功能菜单”。
+退出并重新打开客户端，检查服务状态，再说“开始使用佳明助手”。
+首次会显示中英双语欢迎语，请先回复 `1`（中文）或 `2`（English），
+选好语言后再说“显示原有功能菜单 / Show original function menu”。
 
 示例结构（把 Python 路径换成 `client-config` 输出）：
 
@@ -110,7 +112,7 @@ doubao mcp list --json
 
 1. `doctor` 能显示版本、自己的时区和 `key_configured`。
 2. `doctor --live` 返回 `garmin_status: ok` 或明确的无数据状态。
-3. 客户端能调用 `garmin_function_menu`，看到核心 1–7。
+3. 首次先调用 `garmin_welcome` 选择语言，然后调用 `garmin_function_menu` 看到核心 1–7。
 4. 同步后能返回间隔起止与缺失信息。
 5. 添加自定义功能、隐藏 1–7，再输入“显示原有功能菜单”，原菜单恢复且扩展仍在。
 

@@ -126,7 +126,7 @@ def assess(history, as_of, subjective=None, planned_km=None, sync_ok=True, goal=
         'easy_if_well':f'若明早复评正常且无伤痛和生病，可考虑约 {minutes} 分钟轻松跑；当前没有确定恢复不足信号。',
     }[decision]
     if urgent:text='报告胸痛或晕厥：停止运动并及时就医；若症状正在发生或严重，应立即急诊处理。'
-    return {'as_of':as_of,'target_date':(day+timedelta(days=1)).isoformat(),'provisional':True,
+    return {'as_of':as_of,'target_date':(day+timedelta(days=1)).isoformat(),'provisional':True,'urgent_symptoms':urgent,
             'decision':decision,'recommendation':text,'quality_session_eligible':quality,
             'quality_note':'即使具备质量课条件，也必须在明早同步后确认睡眠、疲劳和伤痛，再结合周计划决定。',
             'suggested_easy_minutes':minutes,'metrics':metrics,'flags':flags,'missing':missing,

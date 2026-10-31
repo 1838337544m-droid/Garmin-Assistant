@@ -54,11 +54,15 @@ class TrainingWorkflow:
             from .menu import MenuStore
             result['function_menu']=MenuStore(self.folder/'menu-preferences.json').view()['function_menu']
         result['timezone']=self.settings.timezone if self.settings else 'UTC'
+        result['language']=self.settings.language if self.settings else 'zh'
         result['model_application']=[
             {'model_id':'fitness_fatigue','interpretation':f"近期负荷：7 日跑量 {result['metrics']['running_km_7d']} 公里；结合 HRV、睡眠和静息心率，当前判断为 {result['decision']}。这是定性判断，并非拟合出的适能/疲劳分数。"},
             {'model_id':'intensity_distribution','interpretation':'当前恢复筛查只支持决定是否降级训练；未根据心率区间完整计算个人极化/金字塔比例，不声称已完成该模型的定量评估。'},
             {'model_id':'daniels','interpretation':f"目前优先使用谈话强度选择轻松跑；阈值/间歇配速需近期能力测试与恢复信息，目标比赛均速（{result['goal']['race_pace']}）不直接作为训练配速。"},
         ]
+        if result['language']=='en':
+            from .onboarding import localize_result
+            result=localize_result(result,'en')
         folder=self.report_folder;folder.mkdir(parents=True,exist_ok=True)
         json_path=folder/f"readiness_{result['target_date']}.json"
         markdown_path=json_path.with_suffix('.md')
@@ -69,6 +73,7 @@ class TrainingWorkflow:
 
 
 def render_report(r):
+    if r.get('language')=='en':return render_english_report(r)
     labels={'avoid_running':'暂不跑步','insufficient_data':'信息不足，暂不安排强度课',
             'recovery':'优先恢复','easy_only':'只考虑轻松训练','easy_if_well':'无不适时可考虑轻松跑'}
     lines=[f"# {r['target_date']} 跑步建议",'',f"数据来源：Garmin；分析日期：{r['as_of']}（{r.get('timezone','UTC')}）。",
@@ -108,4 +113,38 @@ def render_report(r):
             '', '## 功能菜单','']
     lines += [f"{item.get('id',i)}. **{item['command']}**：{item['description']}" for i,item in enumerate(r.get('function_menu',[]),1)]
     lines+=['','如需恢复全部核心菜单，输入：**显示原有功能菜单**。']
+    return '\n'.join(lines)+'\n'
+
+
+def render_english_report(r):
+    lines=[f"# Running advice for {r['target_date']}",'',
+        f"Source: Garmin. Assessment date: {r['as_of']} ({r.get('timezone','UTC')}).",'',
+        f"Goal: {r['goal']['distance_km']:g} km, {r['goal']['target']}. Target race pace: {r['goal']['race_pace']}.",'',
+        f"**Decision: {r['decision']}**",'',r['recommendation'],'',
+        "This is provisional advice. Tonight's sleep and tomorrow's symptoms are not yet known. Recheck in the morning.",'',
+        '## Recovery cues','']
+    lines += [f"- {f['reason']} (source: {f['evidence_id']})" for f in r['flags']] or ['- No configured recovery flag was detected; this is not medical clearance.']
+    lines += ['','## Personal data','','| Metric | Value |','|---|---|']
+    lines += [f"| {k} | {v if v is not None else 'Missing'} |" for k,v in r['metrics'].items()]
+    lines += ['','## Limitations','',f"- Fresh complete sync: {r['sync'].get('fresh',False)}.",
+        f"- Missing information: {', '.join(r['missing']) or 'None'}.",
+        '- subjective_check means pain, illness, fatigue and other symptom checks have not been confirmed.',
+        '- Today is incomplete. Resting heart rate uses the last complete day.',
+        '- These screening thresholds are coaching heuristics, not validated personal injury probabilities or Garmin Training Readiness.',
+        '', '## Training logic','']+['- '+s for s in r['training_logic']]
+    lines += ['','## Classic frameworks','',
+        '- Fitness–fatigue: interpret training stress alongside recovery; no personal model parameters or race-time predictions have been fitted.',
+        '- Intensity distribution: keep most training recoverable; a full personal polarized/pyramidal time-in-zone calculation has not been performed.',
+        '- Daniels: distinguish easy, threshold and interval purposes; do not derive current training pace or VDOT from a target race result.','']
+    lines += [f"- [{m['title']}]({m['url']}) ({m['year']})" for m in r.get('classic_models',[])]
+    lines += ['','## Reviewed references','']+[f"- [{s['title']}]({s['url']}) ({s['year']}; {s['type']})" for s in r['research']['reviewed_sources']]
+    lines += ['','## Recent research discovery','',f"Status: {r['research']['status']}. Last successful search: {r['research'].get('checked_on') or 'None'}.",
+        'Newly retrieved papers require appraisal and do not automatically change training rules. This is not an exhaustive review.','']
+    lines += [f"- [{s.get('title','Paper')}]({s.get('url','https://pubmed.ncbi.nlm.nih.gov/')}) ({s.get('publication_date','Unknown date')}; not appraised)" for s in r['research'].get('candidates',[])]
+    lines += ['','## Morning recheck','']+['- '+s for s in r['morning_recheck']]
+    interval=r['sync'].get('interval',{})
+    lines += ['','## Interval synchronization','',f"Gap: {interval.get('gap_start')} to {interval.get('gap_end')}; completed: {interval.get('gap_fetch_completed',False)}.",
+        '', '## Function menu','']
+    lines += [f"{item['id']}. **{item['command']}**: {item['description']}" for item in r.get('function_menu',[])]
+    lines += ['','To restore core items 1–7, say: **Show original function menu / 显示原有功能菜单**.']
     return '\n'.join(lines)+'\n'

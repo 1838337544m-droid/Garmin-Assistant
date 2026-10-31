@@ -82,7 +82,9 @@ Garmin Personal API key (hidden):
    不是程序卡住，也不是没有粘贴成功。** 不要因为没显示字符就反复粘贴。
 4. 粘贴一次后，按 **回车** 提交。不加引号，不输入 `API.txt` 文件名，
    也不把密钥接在 `auth` 命令后面。
-5. 输出中看到 `"saved": true`，表示密钥已保存在你电脑上。
+5. 首次保存后会出现中英双语欢迎语和 `1. 中文 / 2. English`。
+   在终端输入 `1` 或 `2`，再按回车；以后会记住这个选择。
+6. 输出中看到 `"saved": true`，表示密钥已保存在你电脑上。
    **这只表示保存成功，还需要下一步验证密钥能否连接 Garmin。**
 
 如果粘贴错了或不确定是否重复粘贴，按 **Ctrl+C** 取消，再运行一次
@@ -104,6 +106,7 @@ Garmin Personal API key (hidden):
 | `"key_configured": false` | 没有找到密钥；在同一个系统用户和项目环境中重新运行 `auth` |
 | `"garmin_status": "ok"` 且 `"status": "ok"` | 已成功读取 Garmin，可以按平台手册连接 AI |
 | `"garmin_status": "no_data"` | 请求成功，但该日期没有可用记录；先同步手表，或稍后查其它日期 |
+| `"garmin_status": "not_checked"` 且提示选择语言 | 先执行 `language zh` 或 `language en`，再重新运行检查；这次尚未读取健康数据 |
 | `authentication_failed` | 密钥被拒绝；检查是否过期/撤销，重新创建或重新运行 `auth` |
 | `garmin_fetch_failed` | 读取失败；可能是网络、密钥或 Garmin 服务问题，不能判断为连接成功 |
 
@@ -141,6 +144,30 @@ macOS 通常用 **Command+V**，Linux 终端通常用 **Ctrl+Shift+V**。
 确认 `python3 --version` 至少 3.12。上述流程不要求激活虚拟环境。
 验证结果的含义见 Windows 部分的表格；客户端路径请使用 `client-config`
 生成的绝对路径。密钥输入是在终端内进行，不是在 AI 聊天输入框中进行。
+
+## 首次语言选择与切换
+
+首次使用显示：
+
+```text
+欢迎首次使用佳明助手！
+Welcome to Garmin Assistant!
+
+请选择语言 / Please choose your language:
+1. 中文
+2. English
+```
+
+终端 `auth` 在保存密钥后会提示输入 1/2。macOS/Linux 也一样。
+若密钥通过文件或环境变量提前配置，AI 首次调用时会先问语言；选择前不读取健康数据。
+MCP 连接本身不保证客户端立刻弹消息：可以在连接后说“开始使用佳明助手”，
+客户端应先调用 `garmin_welcome`。第一条 1/2 回复只用于选语言，不能误当作功能。
+
+语言会保存在个人设置中，升级保留。选择后核心菜单和聊天建议使用对应语言，
+生成的明日建议也提供英文版本；原始 Garmin 字段名、论文标题和用户自定义文字保持原样。
+随时说“切换为英文 / Switch to English”或“切换为中文 / Switch to Chinese”。
+终端可执行 `garmin-assistant language en` / `garmin-assistant language zh`。
+也可在初始化时显式指定 `init --language en`，这属于用户主动选择，不再重复询问。
 
 ## 4. 功能菜单
 

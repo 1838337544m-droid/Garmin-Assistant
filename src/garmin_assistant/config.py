@@ -15,6 +15,7 @@ class Settings:
     timezone: str = 'UTC'
     goal_distance_km: float = 10
     goal_minutes: float = 60
+    language: str | None = None
 
     @property
     def key_file(self):
@@ -37,12 +38,13 @@ def load_settings():
     path=folder/'settings.json'
     raw=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     if raw.get('schema_version',1)!=1:raise ValueError('Unsupported settings schema; use a compatible release')
-    settings=Settings(folder,timezone=raw.get('timezone','UTC'),goal_distance_km=raw.get('goal_distance_km',10),goal_minutes=raw.get('goal_minutes',60))
+    settings=Settings(folder,timezone=raw.get('timezone','UTC'),goal_distance_km=raw.get('goal_distance_km',10),goal_minutes=raw.get('goal_minutes',60),language=raw.get('language'))
     validate(settings)
     return settings
 
 
 def validate(settings):
+    if settings.language not in (None,'zh','en'):raise ValueError('Language must be zh or en')
     try:ZoneInfo(settings.timezone)
     except (ZoneInfoNotFoundError,ValueError,TypeError):raise ValueError('Invalid IANA timezone') from None
     for name,value,limit in [('distance',settings.goal_distance_km,200),('minutes',settings.goal_minutes,1440)]:
@@ -50,11 +52,11 @@ def validate(settings):
 
 
 def save_settings(settings,**changes):
-    unknown=set(changes)-{'timezone','goal_distance_km','goal_minutes'}
+    unknown=set(changes)-{'timezone','goal_distance_km','goal_minutes','language'}
     if unknown:raise ValueError('Unknown settings field')
     updated=replace(settings,**changes);validate(updated)
     atomic_json(settings.data_dir/'settings.json',{'schema_version':1,'timezone':updated.timezone,
-        'goal_distance_km':updated.goal_distance_km,'goal_minutes':updated.goal_minutes})
+        'goal_distance_km':updated.goal_distance_km,'goal_minutes':updated.goal_minutes,'language':updated.language})
     return updated
 
 

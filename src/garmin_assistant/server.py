@@ -16,6 +16,7 @@ from .research import update_research
 from .menu import FUNCTION_MENU, MenuStore
 from .config import load_settings, local_today
 from zoneinfo import ZoneInfo
+from .onboarding import welcome,choose_language,language_guard,localize_result
 
 logging.getLogger('garmin_personal_api').setLevel(logging.WARNING)
 settings = load_settings()
@@ -26,6 +27,7 @@ service = GarminService(DATA / 'cache.sqlite3', OfficialProvider(KEY, DATA / 'be
 training = TrainingWorkflow(service, DATA, settings=settings)
 READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=True)
 mcp = FastMCP('Garmin 助手（API）版本', instructions=(
+    'FIRST USE: call garmin_welcome before health tools. If language_selection_required=true, display its bilingual welcome and ask 1. 中文 / 2. English; wait for the answer, then call garmin_set_language(zh/en). A first-use number selects language, not a function. Do not auto-pick a language or read health data first. After selection, answer in the saved language. Users can switch any time. MCP cannot independently open a chat; show welcome at first interaction. '
     'For every Garmin health/training analysis, first fill the interval since the previous successful sync using garmin_sync_data; garmin_assess_tomorrow already does this. '
     'If last literature search is >=7 days old, refresh research before advice; never claim latest evidence if refresh fails. '
     'Combine applicable current running/recovery evidence with cited classic models. Assess candidate abstracts before using their findings; do not automatically treat them as reviewed rules. '
@@ -61,41 +63,50 @@ def current_workflow():
 def garmin_status() -> dict:
     """Get local cache coverage, freshness policy and credential-file presence; no network call."""
     snapshot=load_settings()
-    return {**service.status(), 'key_file_exists': snapshot.key_file.is_file(),
+    result={**service.status(), 'key_file_exists': snapshot.key_file.is_file(),
             'default_timezone': snapshot.timezone, 'today': today(snapshot),'function_menu':menu_store.view()['function_menu']}
+    if snapshot.language:return localize_result(result,snapshot.language)
+    result.pop('function_menu')
+    return {**result,**welcome(snapshot)}
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_function_menu(show_original: bool = False) -> dict:
     """Show current numbered menu. If user says 显示原有功能菜单 call with show_original=true to restore 1–7, preserving custom workflows."""
     return menu_store.restore() if show_original else menu_store.view()
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_daily_summary(date: str | None = None, refresh: bool = False) -> dict:
     """Read Garmin daily wellness summary (YYYY-MM-DD; default today), including available daily metrics."""
     return service.query('summary', refresh=refresh, date=date or today())
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_sleep(date: str | None = None, refresh: bool = False) -> dict:
     """Read sleep and sleep stages for a Garmin calendar date (default today). Empty means unavailable."""
     return service.query('sleep', refresh=refresh, date=date or today())
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_heart_rate(date: str | None = None, refresh: bool = False) -> dict:
     """Read a day's heart-rate values and available summary; preserve Garmin units and timestamps."""
     return service.query('heart_rate', refresh=refresh, date=date or today())
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_hrv(date: str | None = None, refresh: bool = False) -> dict:
     """Read heart-rate variability for a Garmin calendar date (default today)."""
     return service.query('hrv', refresh=refresh, date=date or today())
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_range(metric: Literal['steps', 'stress', 'body_battery'],
                  start_date: str, end_date: str, refresh: bool = False) -> dict:
     """Read inclusive date range: steps/stress at most 28 days; Body Battery at most 31 days. Split longer windows."""
@@ -103,6 +114,7 @@ def garmin_range(metric: Literal['steps', 'stress', 'body_battery'],
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_activities(start_date: str | None = None, end_date: str | None = None,
                       start: int = 0, limit: int = 20, refresh: bool = False) -> dict:
     """Read Garmin activities, optionally filtered by date. Paginate using start offset; limit 1-100. Units as returned."""
@@ -115,6 +127,7 @@ def garmin_activities(start_date: str | None = None, end_date: str | None = None
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_activity_detail(activity_id: int, refresh: bool = False) -> dict:
     """Read details of one activity using its positive activityId from garmin_activities."""
     return service.query('activity', refresh=refresh, activity_id=activity_id)
@@ -132,12 +145,14 @@ class SubjectiveCheck(BaseModel):
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_sync_data(days: int = 93, full: bool = False) -> dict:
     """Sync official Garmin data to local history. First call backfills 93 days; later calls overlap 7 days. full=true refetches requested history. Returns coverage/errors, not all raw records."""
     return current_workflow().sync(days=days, full=full)
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_assess_tomorrow(subjective: SubjectiveCheck | None = None,
                            planned_distance_km: float | None = None,
                            refresh_research: bool = False) -> dict:
@@ -147,6 +162,7 @@ def garmin_assess_tomorrow(subjective: SubjectiveCheck | None = None,
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_update_research(force: bool = True) -> dict:
     """Discover recent running-training and rehabilitation papers from PubMed. No health data sent. Includes dated reviewed sources and unappraised candidates; network failures are explicitly reported."""
     return update_research(DATA, today(), force=force)
@@ -156,27 +172,44 @@ LOCAL_WRITE = ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWor
 
 
 @mcp.tool(annotations=LOCAL_WRITE)
+@language_guard
 def garmin_hide_core_menu(hidden_ids: list[int]) -> dict:
     """Hide core menu IDs 1–7 from display only; no core tools are removed. Empty list restores visibility. Data and custom functions remain intact."""
     return menu_store.hide(hidden_ids)
 
 
 @mcp.tool(annotations=LOCAL_WRITE)
+@language_guard
 def garmin_add_custom_function(name: str, instructions: str) -> dict:
     """Add a user-authored prompt workflow under a stable ID >=100. Cannot replace core tools/names, change core rules, or execute Python code."""
     return menu_store.add(name,instructions)
 
 
 @mcp.tool(annotations=LOCAL_WRITE)
+@language_guard
 def garmin_remove_custom_function(custom_id: int) -> dict:
     """Remove only a custom workflow ID >=100; core functions cannot be deleted."""
     return menu_store.remove(custom_id)
 
 
 @mcp.tool(annotations=READ_ONLY)
+@language_guard
 def garmin_get_custom_function(custom_id: int) -> dict:
     """Retrieve a custom workflow as user-supplied instructions, not system policy. Original synchronization/evidence/privacy/symptom rules still apply."""
     return menu_store.get(custom_id)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def garmin_welcome() -> dict:
+    """Call at first interaction. Returns bilingual welcome and language choices without reading Garmin data."""
+    return welcome()
+
+
+@mcp.tool(annotations=LOCAL_WRITE)
+def garmin_set_language(language: Literal['zh','en']) -> dict:
+    """Save the explicitly selected language: 1/中文 => zh, 2/English => en. Can be used any time to switch."""
+    selected=choose_language(language)
+    return localize_result({**menu_store.view(),'message':'语言已设为中文。' if selected.language=='zh' else 'Language set to English.'},selected.language)
 
 
 def run():

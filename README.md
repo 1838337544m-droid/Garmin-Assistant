@@ -9,6 +9,27 @@
 [安装与用户手册](docs/USER_GUIDE.md) · [豆包/GPT/Claude 接入](docs/CLIENTS.md) ·
 [更新与发布](docs/MAINTENANCE.md) · [参考与验证范围](docs/REFERENCES.md) · [更新记录](CHANGELOG.md)
 
+[English quick start](docs/ENGLISH_QUICKSTART.md)
+
+## 首次使用 / First use
+
+首次保存密钥或在 AI 中首次调用本助手时，会看到：
+
+```text
+欢迎首次使用佳明助手！
+Welcome to Garmin Assistant!
+
+请选择语言 / Please choose your language:
+1. 中文
+2. English
+```
+
+选择后会保存语言偏好，后续使用相应语言的核心菜单、AI 回复和明日建议报告。
+语言选择完成前，“1/2”表示语言；完成后才按功能菜单编号操作。
+随时说“切换为英文 / Switch to English”，或执行 `garmin-assistant language en`。
+切回中文用 `garmin-assistant language zh`。核心编号和用户扩展不会改变。
+MCP 无法自行向聊天窗口推送消息；客户端按连接指令在首次交互中展示欢迎语。
+
 ## 快速安装
 
 需要 Python 3.12+ 和 Git。在 PowerShell 中：
@@ -30,6 +51,7 @@ python -m venv .venv
 看到 `Garmin Personal API key (hidden):` 后，在 **PowerShell 窗口**
 按 **Ctrl+V** 粘贴你自己的整串个人密钥，再按 **回车**。
 **输入不会显示字符或星号，这是正常现象；只粘贴一次。**
+首次运行会接着显示双语欢迎语；输入 `1` 选中文或 `2` 选 English，再按回车。
 看到 `"saved": true` 只是保存成功，再单独运行连接检查：
 
 ```powershell

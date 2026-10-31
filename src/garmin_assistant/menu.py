@@ -87,8 +87,10 @@ class MenuStore:
     @menu_transaction
     def add(self,name,instructions):
         name=name.strip();instructions=instructions.strip()
-        reserved={RESTORE_COMMAND}|{x.command for x in CORE_FUNCTIONS}|{t.strip() for x in CORE_FUNCTIONS for t in x.tool.split('/')}
-        if not name or len(name)>60 or name in reserved or name.startswith('garmin_'):
+        from .onboarding import MENU_EN
+        reserved={RESTORE_COMMAND,'Show original function menu'}|{x.command for x in CORE_FUNCTIONS}|{t.strip() for x in CORE_FUNCTIONS for t in x.tool.split('/')}
+        reserved.update(value[0] for value in MENU_EN.values())
+        if not name or len(name)>60 or name.casefold() in {s.casefold() for s in reserved} or name.casefold().startswith('garmin_'):
             raise ValueError('Name empty, too long or reserved by the core')
         if not instructions or len(instructions)>4000:raise ValueError('Instructions must contain 1–4000 characters')
         state=self._load()
