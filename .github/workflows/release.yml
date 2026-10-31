@@ -24,4 +24,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --title "Garmin 助手（API）版本 $GITHUB_REF_NAME" --notes-file CHANGELOG.md
+          gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --title "Garmin Assistant (API edition) | Garmin 助手（API）版本 $GITHUB_REF_NAME" --notes-file CHANGELOG.md

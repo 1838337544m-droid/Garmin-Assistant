@@ -1,4 +1,60 @@
-# 不定期更新、发布和回滚
+# Updates, Releases and Rollback | 更新、发布与回滚
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+### User updates
+
+Settings, keys, databases and extensions are in a separate personal data directory.
+For a backup, stop the MCP, confirm the directory with `doctor`, and copy it.
+
+In the original clone, first check for your own changes to tracked files:
+
+```sh
+git status
+git pull --ff-only
+python -m pip install -e .
+garmin-assistant --version
+garmin-assistant doctor
+```
+
+Use the Python and executable from your installation's `.venv`, then restart the AI client.
+If you edited source, preserve it on a branch or resolve the changes yourself; do not force-reset it.
+Ordinary custom workflows belong in `add-function`, not in tracked source files.
+
+### Maintainer release process
+
+1. Update code/docs, `CHANGELOG.md`, `pyproject.toml`, and `src/garmin_assistant/__init__.py`. Versions must match.
+2. Run tests, release-file auditing and package builds; check core IDs and restoration.
+3. Commit and push, then wait for Windows/macOS/Linux CI success.
+4. Push a `vX.Y.Z` tag. `release.yml` builds source/wheel files and SHA256 checksums and creates the bilingual GitHub Release.
+5. Share the repository or Releases/latest URL so users can find the current version and instructions.
+
+```sh
+python -m pytest -q
+python scripts/check_release.py
+python -m build
+git add src tests docs README.md CHANGELOG.md pyproject.toml scripts .github
+git commit -m "Release vX.Y.Z"
+git push
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+This project does not automatically publish to PyPI or require users to execute remote update scripts.
+The GitHub release workflow uses the repository-provided GITHUB_TOKEN, not a stored personal key.
+
+### Compatibility and rollback
+
+1. Patch releases fix issues; minor releases add compatible features. Core contracts/data-format breaks require major-version explanation.
+2. Current settings/menu schema is version 1; unknown versions must fail rather than clear preferences.
+3. Keep old tags/releases. Back up data before rollback; older code is not guaranteed to read future formats.
+4. Clone an old tag into a separate directory, create its own `.venv`, and test against copied data before switching clients.
+5. Do not delete custom workflows, renumber core actions or move user extensions into source.
+
+---
+
+## 中文版本
 
 ## 用户更新
 
@@ -26,7 +82,7 @@ garmin-assistant doctor
 2. 执行 `pytest`、发布文件扫描、构建，检查核心编号与恢复操作。
 3. 提交并推送；等待 Windows/macOS/Linux CI 全通过。
 4. 打 `vX.Y.Z` 标签并推送；`release.yml` 构建源码包和 wheel，附 SHA256，
-   通过 GitHub CLI 创建名为“Garmin 助手（API）版本 vX.Y.Z”的 Release。
+   通过 GitHub CLI 创建名为“Garmin Assistant (API edition) | Garmin 助手（API）版本 vX.Y.Z”的双语 Release。
 5. 分享仓库首页或 Releases/latest 链接，用户始终能找到当前版本和说明。
 
 ```sh

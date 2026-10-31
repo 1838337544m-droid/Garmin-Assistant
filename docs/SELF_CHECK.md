@@ -1,4 +1,48 @@
-# 0.1.0 本机自检记录
+# Self-check Records | 自检记录
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+### Version 0.1.0 — local verification
+
+Date: 2026-10-31. Windows, Python 3.13.
+
+| Check | Result |
+|---|---|
+| Fresh virtual-environment installation | Passed |
+| Synthetic suite | 50 tests and 7 subcases passed |
+| Dependency consistency (`pip check`) | Passed |
+| Source and wheel builds | Passed; SHA256 included |
+| Local stdio discovery | 16 tools |
+| Add extension → hide core → restore original → retain extension | Passed through actual MCP calls |
+| Delete a core function | Rejected |
+| Concurrent custom additions | All 16 retained with unique sequential IDs |
+| Custom goal/timezone | Persistence, reload and non-UTF-8 terminal regressions passed |
+| Official Garmin connection | Passed with an external key path; validation data was not committed |
+| Release-file auditing | No known key pattern, private absolute path, database or health report found |
+
+See repository Actions for cross-platform synthetic results. These do not establish end-to-end support
+for every Doubao/GPT/Claude client edition. See [client limits](CLIENTS.md). Pattern scanning cannot rule out every unknown secret format.
+
+### Version 0.1.2 — language and first-use verification
+
+The local suite increased to 62 tests and 7 subcases. Actual stdio first-use checks discover 18 tools;
+before language choice, health tools return the bilingual welcome without reading health data.
+An explicit English choice changes menus while preserving IDs. Synthetic regressions cover terminal
+authentication prompts, saved language switching, English reports, urgent-symptom priority and guarding
+live diagnostics before language selection.
+
+Immediate popups depend on the client. The project prompts at first interaction; MCP cannot independently push chat messages.
+
+### Version 0.1.3 — bilingual documentation checks
+
+The README and public guides place English above Chinese, with language links directly below each
+document title. Navigation, local links, code-fence balance and the release-file audit are checked before publication.
+Runtime behavior is unchanged by this documentation release.
+
+---
+
+## 中文版本
 
 日期：2026-10-31；Windows，Python 3.13。
 
@@ -28,3 +72,8 @@ English 后菜单切换并保留原有编号。终端认证提示、语言切换
 紧急症状优先级及未选语言的在线诊断保护均有合成回归测试。
 客户端是否在连接时立即弹出消息仍取决于宿主；程序保证首次交互提示，
 不声称 MCP 可主动推送聊天消息。
+
+## 0.1.3 双语文档检查
+
+README 和公开文档统一为英文在上、中文在下，标题下紧接语言导航。
+发布前检查导航、本地链接、代码框配对和待发布文件；本版不改变运行逻辑。

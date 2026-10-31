@@ -1,4 +1,29 @@
-# Garmin 助手（API）版本：发布设计与实施记录
+# Release Design and Implementation | 发布设计与实施
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+Goal: an independently installable, updatable local MCP release, retaining the seven core functions.
+Users can hide them, add separate prompt workflows and restore the original menu without losing extensions.
+
+Architecture: a Python package, stdio MCP and local CLI. Settings, keys, databases, reports and menu
+preferences live outside the source checkout. Documentation follows common auth/serve/quickstart/changelog
+patterns while preserving this project's own implementation. Clients without local stdio use report upload.
+
+1. Copy only allowlisted source and synthetic tests, not real health data, keys or private history documents.
+2. Add portable configuration, timezones, goals, standard installation and CLI diagnostics.
+3. Use immutable core definitions/reserved IDs and separate extension IDs; never override core tools.
+4. Test hiding/restoration, persistence, conflicts, directory isolation and existing sync/analysis behavior.
+5. Document Doubao/GPT/Claude routes, official references and actual verification limits.
+6. Add versioning, updates, builds, CI, release auditing and independent code review.
+7. Create the authorized public GitHub repository, push clean source and publish releases.
+
+Application-level locking cannot prevent forks or source edits. Custom functions are prompt workflows,
+not arbitrary executable Python plugins; these interface constraints are consistent with MIT licensing.
+
+---
+
+## 中文版本
 
 目标：独立、可安装、可反复更新的本地 MCP 分享；保留原有七类核心功能，
 允许隐藏和添加提示词工作流，用“显示原有功能菜单”恢复核心菜单。

@@ -1,4 +1,235 @@
-# 用户手册
+# User Guide | 用户手册
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+### 1. Prepare your own account and key
+
+Install Python 3.12+ and Git. Commands below run in your computer's terminal,
+not in a Doubao, GPT or Claude chat. On Windows the terminal is PowerShell;
+on macOS/Linux open the Terminal application.
+
+Your **personal API key** is a long string, not your Garmin password or an email verification code.
+
+1. Sign in to your own Garmin Connect account in a browser.
+2. Open [Personal API settings](https://connect.garmin.com/app/settings/personalApiToken).
+3. Select **Create Key**, review the terms, select an expiration period and confirm.
+4. Copy the entire key shown once and keep it in a safe personal location.
+5. Do not paste it into an AI chat. A hidden terminal prompt is provided later.
+
+Never use someone else's key, and do not send your key to the maintainer.
+Default timezone is UTC; set your own IANA zone such as `America/New_York`,
+`Europe/London`, `Asia/Shanghai` or `Asia/Dubai`. Your goal is configurable without changing core functions.
+
+### 2. Windows PowerShell installation
+
+#### Step 1 — Open the command window
+
+Press the **Windows key**, type `PowerShell`, and open **Windows PowerShell**.
+When a prompt resembling `PS ... >` appears, you can enter a command.
+Administrator access is not required for this per-user setup.
+
+**Copy one command line, paste it, and press Enter.** Wait for it to finish and the prompt
+to reappear before entering the next line. A code-block copy button may copy the entire block;
+beginners should select individual lines. Do not copy the `PS ... >` prompt or code-block borders.
+
+#### Step 2 — Download and install
+
+Run these four lines separately. `cd` enters the downloaded project folder;
+many installation output lines are normal.
+
+```powershell
+git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+cd garmin-assistant-api
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+```
+
+If `python` is not found, confirm it is installed; an installed Python launcher can use
+`py -3.12 -m venv .venv` instead of the third line. If `git` is not found, install Git first.
+If the project directory already exists, enter your existing checkout instead of cloning over it.
+
+#### Step 3 — Set timezone and goal
+
+```powershell
+.\.venv\Scripts\garmin-assistant.exe init --timezone America/New_York --goal-km 10 --goal-minutes 60
+```
+
+Replace the timezone with your own. Here 10 and 60 mean a 10 km goal in under 60 minutes.
+Output containing `timezone` and `goal` confirms settings were written; it is not a Garmin data read.
+
+#### Step 4 — Enter your personal key
+
+Run **only this line**, separately from the next diagnostic command:
+
+```powershell
+.\.venv\Scripts\garmin-assistant.exe auth
+```
+
+The prompt is:
+
+```text
+Garmin Personal API key (hidden):
+```
+
+The program is now waiting for your key:
+
+1. Copy the complete personal key from Garmin or your safe personal storage.
+2. Return to **PowerShell** and press **Ctrl+V**. If the terminal does not support it, try right-click paste.
+3. **No characters, dots or asterisks appear. This is intentional hidden input, not a frozen program.** Paste only once.
+4. Press **Enter**. Do not add quotation marks, enter an `API.txt` filename, or append the key to the command itself.
+5. First use displays the bilingual welcome. Enter **1** for Chinese or **2** for English and press Enter. The choice is saved.
+6. `"saved": true` means the key is stored locally. It does **not** confirm a successful Garmin connection yet.
+
+If you pasted incorrectly or more than once, press **Ctrl+C**, run `auth` again, paste once and press Enter.
+
+#### Step 5 — Check the connection
+
+Wait until the prompt returns, then run:
+
+```powershell
+.\.venv\Scripts\garmin-assistant.exe doctor --live
+```
+
+| Output | Meaning and next step |
+|---|---|
+| `"key_configured": true` | A key was found; this alone is not proof that it works |
+| `"key_configured": false` | No key was found; rerun `auth` under the same system user and project environment |
+| `"garmin_status": "ok"` and `"status": "ok"` | A Garmin read succeeded; proceed to AI client configuration |
+| `"garmin_status": "no_data"` | The request succeeded but the selected date has no record; sync your watch or try another date |
+| `"garmin_status": "not_checked"` with language choices | Select `language zh` or `language en`, then rerun the check; no health data was read |
+| `authentication_failed` | The key was rejected; check expiry/revocation and rerun `auth` with a valid key |
+| `garmin_fetch_failed` | Network, key or Garmin service failure; do not count this as success |
+
+Continue with the [client setup guide](CLIENTS.md). Saving a key does not automatically install
+the tool into an AI client. In a new PowerShell window, enter the project folder before using
+`.\.venv` commands. You can open that folder in File Explorer, type `powershell` into its address bar,
+and press Enter to open a terminal in the correct location.
+
+### 3. macOS / Linux installation
+
+Check `python3 --version` is at least 3.12, then run:
+
+```sh
+git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+cd garmin-assistant-api
+python3 -m venv .venv
+.venv/bin/python -m pip install -e .
+.venv/bin/garmin-assistant init --timezone America/New_York --goal-km 10 --goal-minutes 60
+```
+
+Use your own timezone. Run authentication separately:
+
+```sh
+.venv/bin/garmin-assistant auth
+```
+
+At the hidden prompt, paste the whole key once and press Enter. macOS commonly uses
+**Command+V**; Linux terminals commonly use **Ctrl+Shift+V**. No characters or asterisks appear.
+Choose 1 (Chinese) or 2 (English) at first use. After `"saved": true`, run separately:
+
+```sh
+.venv/bin/garmin-assistant doctor --live
+```
+
+The diagnostic meanings are the same as the Windows table. These steps do not require activating
+the virtual environment. Generate absolute client paths with `client-config`. Enter the key in the terminal, not in AI chat.
+
+### 4. First-use language choice
+
+The welcome contains **Welcome to Garmin Assistant! / 欢迎首次使用佳明助手！** and asks
+**Please choose your language / 请选择语言：1. 中文　2. English**.
+
+Terminal `auth` asks after saving the key. If the key was preconfigured through a file or environment
+variable, the first MCP interaction asks instead; health data is not read before selection.
+Connecting MCP does not guarantee an immediate chat popup. Say **Start Garmin Assistant**;
+the client should call `garmin_welcome`. The first 1/2 reply selects language, not a core function.
+
+Language is stored with personal settings and retained during updates. Menus, AI reply instructions
+and next-day reports follow it. Raw Garmin fields, original paper titles and custom text are not rewritten.
+Switch with **Switch to English / 切换为英文**, **Switch to Chinese / 切换为中文**, or:
+
+```sh
+garmin-assistant language en
+garmin-assistant language zh
+```
+
+An explicit `init --language en` also records the user's choice without asking again.
+In these short commands, use the executable in your `.venv` if it is not on PATH.
+
+### 5. Core function menu
+
+1. Sync data: initial 93-day backfill, then fill intervening dates and revisit a seven-day overlap.
+2. Assess tomorrow's training against the personal goal.
+3. View activities and details.
+4. View sleep, heart rate and HRV.
+5. Read steps, stress and Body Battery over a date range.
+6. Update running and rehabilitation research.
+7. View sync status and the function menu.
+
+After language selection, reply with a function ID in a connected AI. Hidden core IDs are not
+renumbered; custom functions start at 100.
+
+### 6. Each assessment
+
+The AI should sync first; the next-day assessment tool does so automatically. Long gaps are fetched
+in chunks where Garmin supports the history. Missing data is not zero and does not prove inactivity.
+Research is searched again after seven days since the last successful search; failures are labeled.
+Advice combines recent applicable evidence with classic fitness–fatigue, intensity-distribution and
+Daniels frameworks, with citations. New papers are unappraised candidates, not automatic changes to the rules.
+
+Provide current pain, fatigue, illness and planned distance. Unknown symptoms are not assumed absent.
+Tomorrow's result is provisional until the morning recheck. It is not medical clearance or a guarantee
+of the fastest improvement. Target race pace is not automatically easy-run pace.
+
+### 7. Use without an AI connection
+
+Replace `garmin-assistant` below with your `.venv` executable if needed:
+
+```sh
+garmin-assistant sync
+garmin-assistant tomorrow
+garmin-assistant research
+garmin-assistant menu
+garmin-assistant menu --hide 1 2 3 4 5 6 7
+garmin-assistant menu --original
+```
+
+The terminal prints report paths. For a chat client without local MCP, upload a generated Markdown/JSON
+report. It is a snapshot; it cannot automatically sync the files on your computer.
+
+### 8. Add workflows and hide the core menu
+
+```sh
+garmin-assistant add-function --name "My weekly review" --instructions "Read the last seven days and compare running volume and recovery, with citations."
+```
+
+Ask the AI to hide the original menu, or use `menu --hide`. Restore it with **Show original function menu**
+or **显示原有功能菜单**. CLI also accepts `garmin-assistant "Show original function menu"`.
+Custom functions remain saved. They are user-authored prompt workflows, not arbitrary Python plugins;
+they cannot override core tools or bypass synchronization, evidence, symptom or privacy rules.
+
+### 9. Data, updates and removal
+
+`doctor` shows the actual data directory. Override it using `GARMIN_ASSISTANT_HOME` if needed.
+It holds settings, the key, token cache, history, research, custom menu and reports outside the checkout.
+See [updates and rollback](MAINTENANCE.md). Deleting only the code/virtual environment does not delete
+personal state. For complete removal, first confirm the directory with `doctor`, then remove it yourself.
+Never paste its health contents into an Issue.
+
+### 10. Troubleshooting
+
+- Command not found: use the absolute executable path inside `.venv`.
+- A started MCP server waits silently: stdio waits for a client; this is normal.
+- Rejected key: create a valid key in Garmin Connect, rerun `auth`, then `doctor --live`.
+- Missing sleep/HRV: sync the watch and check device support; missing values are not zero.
+- Research failure: check the status and retry `research` later; prior records are retained.
+- Switching Garmin accounts: use a new `GARMIN_ASSISTANT_HOME` instead of mixing histories.
+- Web/mobile cannot execute local commands: use the report-upload route in the client guide.
+
+---
+
+## 中文版本
 
 ## 1. 首次准备
 

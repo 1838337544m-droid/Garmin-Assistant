@@ -1,4 +1,125 @@
-# Garmin 助手（API）版本
+# Garmin Assistant (API edition) | Garmin 助手（API）版本
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+Use your own Garmin Personal API key to sync activity and health data locally,
+then ask an AI for running and recovery guidance with research citations and classic training frameworks.
+
+**No Garmin password. No shared accounts. No maintainer health data included.**
+This independent project is not affiliated with or endorsed by Garmin.
+
+[Installation and user guide](docs/USER_GUIDE.md) · [Doubao / GPT / Claude setup](docs/CLIENTS.md) ·
+[Updates and releases](docs/MAINTENANCE.md) · [References and verification](docs/REFERENCES.md) · [Changelog](CHANGELOG.md)
+
+### First use
+
+On first key setup or first interaction with the MCP, the assistant asks you to choose a language:
+
+> Welcome to Garmin Assistant! / 欢迎首次使用佳明助手！
+>
+> Please choose your language / 请选择语言：
+> **1. 中文　2. English**
+
+The choice is saved. Before selection, 1/2 selects a language; afterwards numbers select functions.
+Core menus, AI reply instructions and next-day reports support the selected language.
+Switch any time with `garmin-assistant language en` or `garmin-assistant language zh`.
+MCP cannot independently open a chat popup: the client presents the welcome at first interaction.
+
+### Quick installation — Windows PowerShell
+
+Install Python 3.12+ and Git. Open PowerShell and run **one line at a time**:
+
+```powershell
+git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+cd garmin-assistant-api
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\garmin-assistant.exe init --timezone America/New_York
+```
+
+Set your own IANA timezone rather than copying the example blindly. Default is UTC.
+The initial goal is 10 km in under 60 minutes; change it with `--goal-km` and `--goal-minutes`.
+For complete Windows and macOS/Linux instructions, see the [beginner user guide](docs/USER_GUIDE.md).
+
+Run authentication **separately**:
+
+```powershell
+.\.venv\Scripts\garmin-assistant.exe auth
+```
+
+At `Garmin Personal API key (hidden):`, paste your complete personal key once into
+**PowerShell**, then press **Enter**. **No characters or asterisks appear; that is normal.**
+Do not paste your key into an AI chat. First use then asks for 1 (Chinese) or 2 (English).
+`"saved": true` means the key was stored, not yet verified. Only after that, run:
+
+```powershell
+.\.venv\Scripts\garmin-assistant.exe doctor --live
+```
+
+`"garmin_status": "ok"` confirms a successful Garmin read. Never paste the authentication
+and diagnostic commands together while the program is asking for the key.
+
+### Function menu
+
+| ID | Core function |
+|---|---|
+| 1 | Sync data and fill the interval since the previous successful sync |
+| 2 | Assess tomorrow's training |
+| 3 | View activities and activity details |
+| 4 | View sleep, heart rate and HRV |
+| 5 | Read steps, stress and Body Battery over a date range |
+| 6 | Refresh running and rehabilitation research |
+| 7 | View sync status and the function menu |
+
+Core IDs 1–7 are stable. Hide them without removing the tools; say **Show original function menu**
+or **显示原有功能菜单** to restore them. Custom prompt workflows retain IDs starting at **100**.
+They cannot override core tools and do not execute arbitrary third-party code.
+
+### AI client compatibility
+
+| Client | Connection offered by this edition |
+|---|---|
+| Claude Desktop / Claude Code | Local stdio MCP configuration |
+| GPT / Codex environments with local execution | Register the generated absolute command as a local MCP |
+| Ordinary ChatGPT web/mobile | Generate a report locally and upload it; no remote OAuth connector is provided |
+| Doubao editions that expose local MCP | Configure stdio through that edition's supported entry point |
+| Ordinary Doubao chat / clients without local MCP | Upload a locally generated report; no automatic local sync |
+
+Use `client-config` to generate paths for your actual installation. See the [client guide](docs/CLIENTS.md).
+This release is not a hosted service, browser extension or prelisted official client application.
+
+### Data and evidence
+
+- Initial sync requests 93 days; later syncs fill gaps and revisit overlapping dates. Missing records and failures are explicit.
+- Next-day assessment syncs first. Research is refreshed after 7 days since the last successful search, or on demand.
+- HRV, sleep, resting heart rate and recent running are interpreted against personal references. Unknown symptoms remain unknown.
+- Reports cite classic fitness–fatigue, intensity-distribution and Daniels frameworks alongside applicable recent research.
+- Newly retrieved papers require appraisal; they do not automatically rewrite training rules.
+- Advice is provisional until the morning recheck, not medical clearance, an injury-risk probability or a fastest-progress guarantee.
+
+Keys, settings, history, reports and custom menus are outside the source checkout, so code updates preserve them.
+Tool results go to your connected AI provider; choose a client that fits your privacy preferences.
+
+### Updates, extensions and self-check
+
+Releases are published periodically. Users choose when to update; the project does not silently download and execute new code.
+See [maintenance and rollback](docs/MAINTENANCE.md). MIT allows modification and forks;
+the immutable core is an official-release/extension compatibility contract, not a prohibition on editing open-source code.
+
+```sh
+python -m pip install -e ".[dev]"
+python -m pytest -q
+python scripts/check_release.py
+python -m build
+```
+
+CI runs synthetic tests on Windows, macOS and Linux without personal Garmin credentials.
+See [verification scope](docs/REFERENCES.md) and [self-check records](docs/SELF_CHECK.md).
+
+---
+
+## 中文版本
 
 用自己的 Garmin Personal API 密钥，在本机同步运动与健康数据，让 AI 结合
 长跑训练、恢复研究和经典模型提供有出处的建议。
@@ -9,7 +130,7 @@
 [安装与用户手册](docs/USER_GUIDE.md) · [豆包/GPT/Claude 接入](docs/CLIENTS.md) ·
 [更新与发布](docs/MAINTENANCE.md) · [参考与验证范围](docs/REFERENCES.md) · [更新记录](CHANGELOG.md)
 
-[English quick start](docs/ENGLISH_QUICKSTART.md)
+[英文快速入门](docs/ENGLISH_QUICKSTART.md)
 
 ## 首次使用 / First use
 

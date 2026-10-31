@@ -1,4 +1,28 @@
-# 来源与依赖
+# Third-party Notices | 第三方来源与依赖
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+This is an independent project, not an official Garmin product. Garmin and Garmin Connect are trademarks
+of their respective owners. Each user uses their own key for the official Personal API.
+
+Runtime dependencies include Garmin's `garmin-connect-personal-api-python` (Apache-2.0), MCP Python SDK
+(MIT), and tzdata under its included license. Dependencies are installed from package indexes, not
+embedded in this source repository. Check installed metadata for transitive dependency licenses.
+
+The following projects were examined for public installation/update patterns, not copied implementations:
+
+- [Mason-Levyy/garmin-personal-mcp](https://github.com/Mason-Levyy/garmin-personal-mcp): separate authentication, stdio, quickstart and changelog.
+- [Sinfjell/garmin-mcp](https://github.com/Sinfjell/garmin-mcp): client-specific configuration, capability and privacy explanations.
+- [Fullstop000/doubao-cli](https://github.com/Fullstop000/doubao-cli): optional third-party Doubao registration, not official compatibility assurance.
+
+Papers are cited by title, date and URL; paywalled full text is not redistributed. Retrieved abstracts
+support personal evidence screening. Reports distinguish reviewed references from unappraised candidates.
+See [sources and verification](docs/REFERENCES.md).
+
+---
+
+## 中文版本
 
 本项目不隶属 Garmin，不是 Garmin 官方产品。Garmin/Garmin Connect
 商标归各自权利人所有。使用官方 Personal API，各用户仅使用自己的密钥。

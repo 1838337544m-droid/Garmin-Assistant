@@ -1,4 +1,28 @@
-# 贡献与核心兼容
+# Contributing and Core Compatibility | 贡献与核心兼容
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+```sh
+python -m pip install -e ".[dev]"
+python -m pytest -q
+python scripts/check_release.py
+```
+
+Submit synthetic tests only; never upload personal keys, real activities or health reports.
+Core IDs and meanings are a compatibility contract: extensions may add separate functions but may not
+rename, remove or override core actions. Hiding is display preference, not permission revocation.
+
+For ordinary customization use `add-function`, without editing source. Propose new APIs, algorithms
+or executable tools through a PR explaining evidence, tests and migration. Threshold changes need
+their own evidence and uncertainty record; a new paper alone does not justify automatic replacement.
+
+MIT permits modification and forks. The core compatibility rule governs official releases and the
+extension interface, not a legal or technical ban on changing open-source code.
+
+---
+
+## 中文版本
 
 ```sh
 python -m pip install -e ".[dev]"

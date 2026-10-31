@@ -1,4 +1,132 @@
-# 豆包、GPT、Claude 安装接入
+# Doubao / GPT / Claude Setup | 豆包／GPT／Claude 接入
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+Checked on 2026-10-31. Complete the [general installation](USER_GUIDE.md) first.
+MCP is a tool protocol: pasting a Markdown guide into chat does not give the AI access to your computer.
+
+### 1. Generate configuration for this computer
+
+Windows:
+
+```powershell
+.\.venv\Scripts\garmin-assistant.exe client-config --client claude
+.\.venv\Scripts\garmin-assistant.exe client-config --client codex
+.\.venv\Scripts\garmin-assistant.exe client-config --client doubao
+```
+
+On macOS/Linux use `.venv/bin/garmin-assistant`. No key values are embedded. Copy only the
+`mcpServers` configuration; the top-level `note` is explanatory, not a client setting.
+Keep the generated nonsecret data-directory/key-file paths with the configuration.
+
+### 2. Claude
+
+#### Claude Desktop
+
+Use the client's local MCP/developer configuration entry point and merge the generated `mcpServers`
+entry without overwriting other servers. Windows commonly uses
+`%APPDATA%/Claude/claude_desktop_config.json`; macOS commonly uses
+`~/Library/Application Support/Claude/claude_desktop_config.json`. The file opened by the client's
+**Edit Config** command is authoritative; Store editions may use different paths.
+
+Restart the client and say **Start Garmin Assistant**. Choose 1 (Chinese) or 2 (English) at first use,
+then say **Show original function menu**. Configuration shape:
+
+```json
+{
+  "mcpServers": {
+    "garmin-assistant": {
+      "command": "ABSOLUTE_PATH_TO_VENV_PYTHON",
+      "args": ["-m", "garmin_assistant", "serve"]
+    }
+  }
+}
+```
+
+Use actual paths and environment entries generated on your machine. This project does not ship
+an `.mcpb` desktop extension and is not claimed to be listed in the official directory.
+[Official local MCP guide](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop).
+
+#### Claude Code
+
+```sh
+claude mcp add garmin-assistant -- ABSOLUTE_PATH_TO_VENV_PYTHON -m garmin_assistant serve
+```
+
+Quote paths containing spaces. Check your installed client's help for supported options.
+
+### 3. GPT / Codex
+
+In a Codex/desktop environment that supports local MCP, use the argv returned by
+`client-config --client codex`, including its nonsecret `--env` path settings.
+The general command structure is:
+
+```sh
+codex mcp add garmin-assistant -- ABSOLUTE_PATH_TO_VENV_PYTHON -m garmin_assistant serve
+codex mcp get garmin-assistant
+```
+
+You can also add the command in MCP server settings and restart.
+[Official MCP configuration](https://learn.chatgpt.com/docs/extend/mcp).
+
+**Ordinary ChatGPT web chat does not gain access to local configuration files this way.**
+Remote custom connectors are a separate network path; this edition has no remote authentication server.
+Instead:
+
+1. Run `garmin-assistant tomorrow` locally and wait for synchronization and report generation.
+2. Upload the Markdown report from the path returned in the terminal.
+3. Explain your goal, current symptoms/fatigue and the question. Generate a new local report for new data.
+
+A report upload is not an automatic-sync installation.
+See [OpenAI custom MCP documentation](https://developers.openai.com/api/docs/guides/custom-mcp-server) for the separate remote mechanism.
+
+### 4. Doubao
+
+First distinguish a Doubao Work/client edition with local tool execution from ordinary web/mobile chat.
+The [Doubao developer platform](https://open.doubao.com/) describes Skill/Plugin/MCP concepts;
+this does not prove every account or edition has a generic local stdio entry point.
+
+If the client actually provides **Local MCP / Add server**, use the command and arguments returned by
+`client-config --client doubao`. If it only accepts a remote URL, a local Python path is not suitable;
+use the report-upload route instead.
+
+#### Optional third-party CLI route
+
+[Fullstop000/doubao-cli](https://github.com/Fullstop000/doubao-cli) documents local MCP registration.
+Its desktop route requires a supported macOS client; its Headless route supports Linux/macOS.
+This project has not verified that bridge in Windows Doubao and does not treat it as an official installer
+or install it automatically.
+
+Only if you have independently installed/trust that CLI, signed in and meet its platform requirements:
+
+```sh
+doubao mcp register garmin-assistant --command ABSOLUTE_PATH_TO_VENV_PYTHON --arg -m --arg garmin_assistant --arg serve
+doubao mcp list --json
+```
+
+Follow that project's current README for connector IDs, per-message binding and permission settings.
+Do not expose your key or start an unauthenticated public tunnel to make this work.
+
+#### Ordinary Doubao chat
+
+Generate a local `tomorrow` report and upload it. MCP is not required, but each update is a new manual
+snapshot. Core actions still execute through the local CLI or a connected MCP.
+
+### 5. Acceptance checklist
+
+1. `doctor` shows the version, your timezone and whether a key is configured.
+2. After language selection, `doctor --live` returns a successful Garmin read or explicit no-data status.
+3. First call `garmin_welcome` and choose a language; `garmin_function_menu` then shows IDs 1–7.
+4. Sync returns the gap dates and missing-record information.
+5. Add a custom function, hide 1–7, then request the original menu: it returns without deleting the extension.
+
+Only clients where these steps were actually completed count as end-to-end verified. A configuration
+example alone is not proof of client compatibility.
+
+---
+
+## 中文版本
 
 核对日期：2026-10-31。先完成[通用安装](USER_GUIDE.md)，再选你的客户端。
 MCP 是工具协议，不是把 Markdown 指南粘贴到聊天后就获得本机权限。

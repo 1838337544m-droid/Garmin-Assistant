@@ -1,4 +1,46 @@
-# 更新记录
+# Changelog | 更新记录
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+### 0.1.3 — 2026-10-31
+
+- Reorganized public documentation into English-first and Chinese-second sections.
+- Added **English version | 中文版本** navigation directly beneath the README title and document titles.
+- Translated installation, client setup, updates, references, security, contribution and self-check guidance.
+- Updated release presentation to bilingual titles; runtime behavior and core functions are unchanged.
+
+### 0.1.2 — 2026-10-31
+
+- Added a bilingual first-use welcome with explicit Chinese/English selection and persistent preference.
+- Added welcome/language CLI commands and MCP tools; health reads wait until a language is selected.
+- Localized core menus, AI reply instructions and next-day reports; raw Garmin fields/custom text remain unchanged.
+- Preserved core IDs, reserved English core names and urgent-symptom priority; added an English quickstart.
+- Documented that MCP prompts on first interaction rather than independently pushing chat messages.
+
+### 0.1.1 — 2026-10-31
+
+- Clarified beginner installation, hidden key entry, key storage versus connection checks, and failure handling.
+- Separated authentication and diagnostics to prevent the next command being pasted as a key.
+- Updated the homepage and macOS/Linux guidance.
+
+### 0.1.0 — 2026-10-31
+
+- First public release using the official Garmin Personal API/client.
+- Added local history sync, next-day advice, weekly research discovery and classic-framework citations.
+- Added configurable timezone/goals, stable hideable core IDs 1–7, and independent custom IDs >=100.
+- Stored personal state separately from code; documented Windows/macOS/Linux installation and client/report-upload routes.
+
+---
+
+## 中文版本
+
+## 0.1.3 — 2026-10-31
+
+- GitHub 首页和公开文档统一为英文在上、中文在下。
+- README 标题下第一行增加 English version | 中文版本 跳转，中文入口使用中文。
+- 安装、平台接入、更新、参考、安全、贡献和自检说明补充英文内容。
+- 发布标题改为双语；程序行为和核心功能保持不变。
 
 ## 0.1.2 — 2026-10-31
 

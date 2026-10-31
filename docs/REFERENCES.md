@@ -1,4 +1,42 @@
-# 参考分享模式、来源与验证范围
+# References and Verification Scope | 参考与验证范围
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+Checked on 2026-10-31. References inform documentation patterns, not copied implementations or personal datasets.
+
+| Source | Pattern examined | Application / limit |
+|---|---|---|
+| [Mason-Levyy/garmin-personal-mcp](https://github.com/Mason-Levyy/garmin-personal-mcp) | Separate auth, stdio, quickstart, version history | Similar command separation; this project keeps its own sync/history/advice code |
+| [Sinfjell/garmin-mcp](https://github.com/Sinfjell/garmin-mcp) | Client-specific setup and capability scope | Distinguish local MCP/report upload; do not reuse unofficial password authentication |
+| [Fullstop000/doubao-cli](https://github.com/Fullstop000/doubao-cli) | Third-party Doubao registration | Optional route only, with platform and verification limits |
+| [Claude local MCP guide](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop) | Servers versus desktop extensions | Configuration example, not a claim of directory listing |
+| [OpenAI MCP docs](https://learn.chatgpt.com/docs/extend/mcp) | Local stdio and configuration | Distinguish local execution from ordinary web chat |
+| [Doubao developer platform](https://open.doubao.com/) | Skill/Plugin/MCP concepts | Not a compatibility guarantee for every client edition |
+| [Garmin Personal API FAQ](https://developer.garmin.com/gc-developer-program/personal/personal-faq/) | Each person's own key | No shared account or maintainer-hosted multi-user service |
+
+### Verification scope
+
+- Tests cover synchronization, range caching, failure preservation, missing data, recovery screening and research.
+- Added coverage includes hide/restore, extension conflicts, stable IDs, configurable goals, isolated settings and language onboarding.
+- Local Windows checks include a fresh virtual environment, CLI, package builds and actual stdio discovery/calls.
+- GitHub CI runs synthetic tests on Windows/macOS/Linux with Python 3.12/3.13.
+- Release auditing checks known secret patterns, private paths, databases and health-report files.
+
+Not every Doubao/GPT/Claude product edition was tested with a real account end to end.
+Protocol tests are not proof that every product exposes an installation UI. Follow the client checklist.
+
+### Sports-science references
+
+Reports identify checked studies/classic frameworks with years and their actual use.
+Frameworks include [Banister–Morton fitness–fatigue](https://pubmed.ncbi.nlm.nih.gov/2246166/),
+[Seiler intensity distribution](https://pubmed.ncbi.nlm.nih.gov/20861519/), and
+[Daniels' Running Formula](https://us.humankinetics.com/products/daniels-running-formula-4th-edition).
+Without current personal testing, the project does not pretend to have fitted a complete model or obtained VDOT.
+
+---
+
+## 中文版本
 
 资料核对日期：2026-10-31。参考的是组织方式，不复制其他项目的实现或个人数据。
 

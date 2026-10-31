@@ -1,4 +1,32 @@
-# 安全与隐私
+# Security and Privacy | 安全与隐私
+[English version](#english-version) | [中文版本](#中文版本)
+
+## English version
+
+Do not post API keys, access tokens or real health records in Issues, screenshots, logs or pull requests.
+If a key leaks, revoke it in Garmin Connect first, then remove the exposed files/history.
+
+The service runs locally, but your connected AI receives the tool results you use. This does not mean
+health data never leaves your computer. Garmin requests go to the official Personal API. Research
+requests send search terms, not health data, to PubMed/Europe PMC.
+
+stdio does not listen on a network port. This edition has no remote HTTP/OAuth service. Do not expose
+personal data through an unauthenticated tunnel. A ChatGPT remote connector is a separate connection path.
+
+Save a key through the hidden `garmin-assistant auth` prompt or provide `GARMIN_PERSONAL_API_KEY`.
+Windows user-directory permissions are managed by the OS. New POSIX data/key permissions are 0700/0600.
+On shared computers, confirm that only your account can access the private data directory.
+
+Custom workflows are user-authored instructions, not system policy. They cannot change synchronization,
+evidence, symptom or privacy rules, run shell/Python automatically, or install third-party code.
+Executable extensions require a PR, tests and compatibility review.
+
+Use GitHub private vulnerability reporting if enabled. Otherwise open a brief Issue without keys,
+health data or a sensitive reproducer and ask the maintainer to arrange private communication.
+
+---
+
+## 中文版本
 
 不要在 Issue、截图、日志或 PR 中提交 API 密钥、访问令牌或真实健康记录。
 发现泄漏应先在 Garmin Connect 撤销密钥，再清理文件和提交历史。
