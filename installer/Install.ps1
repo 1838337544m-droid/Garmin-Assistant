@@ -79,6 +79,6 @@ try {
 } catch {
     Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host '安装未完成。请查看上方原因，解压完整安装包后重试；缺少 Python 时请从 python.org 安装 3.12/3.13 并包含 Tcl/Tk。'
-    Write-Host 'Guide / 使用说明: https://github.com/1838337544m-droid/garmin-assistant-api/blob/main/docs/EASY_INSTALL.md'
+    Write-Host 'Guide / 使用说明: https://github.com/1838337544m-droid/Garmin-Assistant/blob/main/docs/EASY_INSTALL.md'
     exit 1
 }

@@ -15,7 +15,7 @@ need your Garmin password and is not endorsed by Garmin.
 Install Python 3.12+ and Git. On Windows, open PowerShell and run one line at a time:
 
 ```powershell
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
@@ -107,7 +107,7 @@ the code preserves them. See [maintenance and rollback](MAINTENANCE.md).
 安装 Python 3.12+ 与 Git。在 PowerShell 逐行执行：
 
 ```powershell
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .

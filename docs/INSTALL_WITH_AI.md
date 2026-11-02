@@ -8,7 +8,7 @@ It is an instruction, not a credential. Do not append your API key.
 
 ```text
 Install Garmin Assistant (API edition) locally from:
-https://github.com/1838337544m-droid/garmin-assistant-api
+https://github.com/1838337544m-droid/Garmin-Assistant
 
 Read docs/EASY_INSTALL.md and the release notes first. Use the latest published non-prerelease
 GitHub Release, not an arbitrary main-branch snapshot. Follow your own execution/approval rules.
@@ -55,7 +55,7 @@ does not grant an AI control of your computer. For visual installation steps, se
 
 ```text
 请在我这台电脑本地安装“Garmin 助手（API）版本”，项目地址：
-https://github.com/1838337544m-droid/garmin-assistant-api
+https://github.com/1838337544m-droid/Garmin-Assistant
 
 先阅读 docs/EASY_INSTALL.md 和发布说明。使用 GitHub 最新正式 Release，不要随意用 main
 分支快照代替。遵循你自己的执行／审批规则。若你不能在“我的电脑”执行命令，请明确说明，

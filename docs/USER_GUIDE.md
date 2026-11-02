@@ -42,7 +42,7 @@ Run these four lines separately. `cd` enters the downloaded project folder;
 many installation output lines are normal.
 
 ```powershell
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
@@ -114,7 +114,7 @@ and press Enter to open a terminal in the correct location.
 Check `python3 --version` is at least 3.12, then run:
 
 ```sh
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python3 -m venv .venv
 .venv/bin/python -m pip install -e .
@@ -274,7 +274,7 @@ Never paste its health contents into an Issue.
 依次执行下面四行。`cd` 表示进入刚下载的项目文件夹；安装时输出很多文字是正常现象。
 
 ```powershell
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
@@ -357,7 +357,7 @@ Garmin Personal API key (hidden):
 ## 3. 安装（macOS/Linux）
 
 ```sh
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python3 -m venv .venv
 .venv/bin/python -m pip install -e .

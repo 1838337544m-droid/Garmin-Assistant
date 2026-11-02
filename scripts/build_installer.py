@@ -39,7 +39,7 @@ def build():
             '5. 保存并接入，检查 Garmin 连接，再重启 AI 客户端。\n'
             '不要把密钥发送到聊天里。普通网页聊天不能自动安装本地 MCP。\n'
             '这是未签名的脚本安装包，不是签名 EXE 或平台官方插件。若系统／组织策略阻止，请联系管理员或使用手动安装说明，不要关闭安全防护。\n\n'
-            'https://github.com/1838337544m-droid/garmin-assistant-api/blob/main/docs/EASY_INSTALL.md\n'
+            'https://github.com/1838337544m-droid/Garmin-Assistant/blob/main/docs/EASY_INSTALL.md\n'
         ).encode('utf-8-sig'))
     print(target.name)
     return target

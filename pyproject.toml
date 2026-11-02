@@ -19,8 +19,8 @@ dev = ["pytest>=8,<10", "build>=1.2,<2"]
 garmin-assistant = "garmin_assistant.cli:main"
 
 [project.urls]
-Repository = "https://github.com/1838337544m-droid/garmin-assistant-api"
-Issues = "https://github.com/1838337544m-droid/garmin-assistant-api/issues"
+Repository = "https://github.com/1838337544m-droid/Garmin-Assistant"
+Issues = "https://github.com/1838337544m-droid/Garmin-Assistant/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

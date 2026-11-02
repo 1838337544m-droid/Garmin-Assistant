@@ -15,7 +15,7 @@ the instructions; it must follow its own permission prompts.
 
 ### Option 2 — Download, extract and double-click (Windows 10/11)
 
-1. Open [Latest release](https://github.com/1838337544m-droid/garmin-assistant-api/releases/latest).
+1. Open [Latest release](https://github.com/1838337544m-droid/Garmin-Assistant/releases/latest).
 2. Under **Assets**, download **Garmin-Assistant-X.Y.Z-Windows-Installer.zip**.
    Do not choose the wheel, tar.gz or GitHub's automatically generated source ZIP.
 3. Right-click the downloaded ZIP → **Extract All** → open the extracted folder.
@@ -106,7 +106,7 @@ AI 按说明安装本地程序并打开设置窗口，你只在这个窗口填�
 
 ### 入口二：下载、解压、双击安装（Windows 10/11）
 
-1. 打开[最新版本下载页](https://github.com/1838337544m-droid/garmin-assistant-api/releases/latest)。
+1. 打开[最新版本下载页](https://github.com/1838337544m-droid/Garmin-Assistant/releases/latest)。
 2. 找到 **Assets（附件）**，下载 **Garmin-Assistant-X.Y.Z-Windows-Installer.zip**。
    不要选择 wheel、tar.gz 或 GitHub 自动生成的源码 ZIP。
 3. 右键下载的 ZIP → **全部解压缩** → 打开解压后的文件夹。

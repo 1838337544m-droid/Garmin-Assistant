@@ -6,7 +6,7 @@
 ### Start here — no coding needed
 
 **[Install with AI](docs/INSTALL_WITH_AI.md#english-version)** ·
-**[Download Windows installer](https://github.com/1838337544m-droid/garmin-assistant-api/releases/latest)** ·
+**[Download Windows installer](https://github.com/1838337544m-droid/Garmin-Assistant/releases/latest)** ·
 **[Step-by-step setup](docs/EASY_INSTALL.md#english-version)**
 
 With a local AI agent, copy the installation prompt. Otherwise download the release's
@@ -42,7 +42,7 @@ MCP cannot independently open a chat popup: the client presents the welcome at f
 Install Python 3.12+ and Git. Open PowerShell and run **one line at a time**:
 
 ```powershell
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
@@ -135,7 +135,7 @@ See [verification scope](docs/REFERENCES.md) and [self-check records](docs/SELF_
 ### 从这里开始：不需要懂代码
 
 **[交给 AI 安装](docs/INSTALL_WITH_AI.md#中文版本)** ·
-**[下载 Windows 安装包](https://github.com/1838337544m-droid/garmin-assistant-api/releases/latest)** ·
+**[下载 Windows 安装包](https://github.com/1838337544m-droid/Garmin-Assistant/releases/latest)** ·
 **[一步步安装说明](docs/EASY_INSTALL.md#中文版本)**
 
 如果 AI 能操作你的电脑，复制安装指令即可；否则在发布页下载 **Windows-Installer.zip**，
@@ -177,7 +177,7 @@ MCP 无法自行向聊天窗口推送消息；客户端按连接指令在首次�
 需要 Python 3.12+ 和 Git。在 PowerShell 中：
 
 ```powershell
-git clone https://github.com/1838337544m-droid/garmin-assistant-api.git
+git clone https://github.com/1838337544m-droid/Garmin-Assistant.git garmin-assistant-api
 cd garmin-assistant-api
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
