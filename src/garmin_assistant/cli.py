@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--version',action='version',version=__version__)
     commands=parser.add_subparsers(dest='command',required=True)
     commands.add_parser('serve',help='Start local stdio MCP')
+    commands.add_parser('setup',help='Open local graphical setup; never paste a key into AI chat')
     init=commands.add_parser('init');init.add_argument('--timezone',default=None);init.add_argument('--goal-km',type=float);init.add_argument('--goal-minutes',type=float)
     init.add_argument('--language',choices=['zh','en'])
     commands.add_parser('welcome',help='Show bilingual welcome and language choices')
@@ -37,6 +38,9 @@ def main():
         settings=load_settings();menus=MenuStore(settings.data_dir/'menu-preferences.json')
         if args.command=='serve':
             from .server import run
+            run();return
+        if args.command=='setup':
+            from .gui_setup import run
             run();return
         if args.command=='welcome' or (args.command=='language' and not args.selection):
             print(welcome(settings)['message']);return

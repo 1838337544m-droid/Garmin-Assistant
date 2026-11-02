@@ -3,6 +3,17 @@
 
 ## English version
 
+### v0.1.4 installation checks
+
+- Setup regressions cover preserving unrelated client entries, backups, explicit replacement,
+  corrupt JSON refusal, private new config permissions, preserved existing permissions,
+  key retention, invalid-settings refusal, missing Codex CLI and failed Codex process handling.
+- Local smoke checks exercise both Tk language forms and actual Codex CLI registration using
+  temporary data/config directories, without reading any private key or changing the existing service.
+- The Windows CI jobs unpack the generated installer and install the wheel in an isolated versioned venv.
+- Release assets include a Windows installer ZIP alongside the wheel/source archive; SHA256 covers all three.
+- Clean-machine WinGet setup and every Claude/Doubao client edition are not claimed as end-to-end verified.
+
 ### Version 0.1.0 — local verification
 
 Date: 2026-10-31. Windows, Python 3.13.
@@ -43,6 +54,16 @@ Runtime behavior is unchanged by this documentation release.
 ---
 
 ## 中文版本
+
+### v0.1.4 安装检查
+
+- 设置回归测试覆盖其他客户端条目保留、备份、明确替换、拒绝损坏 JSON、新配置私有权限、
+  已有配置权限保留、保留密钥、拒绝无效设置、缺少 Codex CLI 和 Codex 进程失败。
+- 本地冒烟检查验证 Tk 中英表单，并在临时数据／配置目录使用真实 Codex CLI 注册，
+  不读取私有密钥、不改动现有服务。
+- Windows CI 解压生成的安装包，在独立版本 venv 中实际安装 wheel。
+- 发布附件新增 Windows 安装 ZIP，与 wheel、源码包一起提供 SHA256。
+- 不声称已端到端验证全新电脑上的 WinGet 安装或所有 Claude／豆包版本。
 
 日期：2026-10-31；Windows，Python 3.13。
 

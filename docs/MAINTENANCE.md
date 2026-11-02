@@ -5,6 +5,10 @@
 
 ### User updates
 
+Installed using the Windows ZIP? Download the new release's Windows installer, run it, then
+select **Replace an existing Garmin entry** in the setup window to switch the client to the new runtime.
+See [guided updates](EASY_INSTALL.md#english-version). The Git commands below are for source installations.
+
 Settings, keys, databases and extensions are in a separate personal data directory.
 For a backup, stop the MCP, confirm the directory with `doctor`, and copy it.
 
@@ -57,6 +61,9 @@ The GitHub release workflow uses the repository-provided GITHUB_TOKEN, not a sto
 ## 中文版本
 
 ## 用户更新
+
+通过 Windows ZIP 安装的用户：下载新版安装包并运行，在设置窗口勾选“替换已有佳明连接条目”，
+即可将客户端切换到新版运行环境。详见[引导更新说明](EASY_INSTALL.md#中文版本)，下方 Git 命令适用于源码安装。
 
 配置、密钥、数据库和扩展都在个人数据目录，源码更新不覆盖。
 需要备份时先退出 MCP，用 `doctor` 确认目录，再复制该目录。

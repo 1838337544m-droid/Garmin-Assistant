@@ -3,6 +3,9 @@
 
 ## English version
 
+**Prefer no code?** Use [Install with AI](INSTALL_WITH_AI.md#english-version) or the
+[Windows double-click installer](EASY_INSTALL.md#english-version). The commands below are the manual route.
+
 ### 1. Prepare your own account and key
 
 Install Python 3.12+ and Git. Commands below run in your computer's terminal,
@@ -230,6 +233,9 @@ Never paste its health contents into an Issue.
 ---
 
 ## 中文版本
+
+**不想输入代码？** 使用[交给 AI 安装](INSTALL_WITH_AI.md#中文版本)或
+[Windows 双击安装包](EASY_INSTALL.md#中文版本)。下方命令是保留的手动安装方式。
 
 ## 1. 首次准备
 

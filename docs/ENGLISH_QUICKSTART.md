@@ -3,6 +3,9 @@
 
 ## English version
 
+For a guided setup, choose [Install with AI](INSTALL_WITH_AI.md#english-version) or
+[Download Windows installer](EASY_INSTALL.md#english-version). The commands below are the manual alternative.
+
 Read your own Garmin data locally, with running/recovery guidance and citations.
 This is an independent project using Garmin's official Personal API. It does not
 need your Garmin password and is not endorsed by Garmin.
@@ -92,6 +95,9 @@ the code preserves them. See [maintenance and rollback](MAINTENANCE.md).
 ---
 
 ## 中文版本
+
+希望引导安装，可选择[交给 AI 安装](INSTALL_WITH_AI.md#中文版本)或
+[下载 Windows 安装包](EASY_INSTALL.md#中文版本)。下方命令为手动方式。
 
 本项目使用自己的 Garmin Personal API 密钥在本机同步数据，不需要 Garmin 密码，
 也不是 Garmin 官方产品。完整零基础步骤见 [用户手册](USER_GUIDE.md#中文版本)。

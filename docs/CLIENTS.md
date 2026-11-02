@@ -3,6 +3,10 @@
 
 ## English version
 
+For guided connection, use the [local setup wizard](EASY_INSTALL.md#english-version).
+It can merge Claude configuration or invoke the installed Codex CLI after a backup.
+The manual examples below remain available. This project still does not ship an `.mcpb` extension.
+
 Checked on 2026-10-31. Complete the [general installation](USER_GUIDE.md) first.
 MCP is a tool protocol: pasting a Markdown guide into chat does not give the AI access to your computer.
 
@@ -127,6 +131,9 @@ example alone is not proof of client compatibility.
 ---
 
 ## 中文版本
+
+想减少手动配置，可使用[本地设置窗口](EASY_INSTALL.md#中文版本)，
+在备份后自动合并 Claude 配置或调用已安装的 Codex CLI。下面保留手动方式，尚未提供 `.mcpb` 扩展。
 
 核对日期：2026-10-31。先完成[通用安装](USER_GUIDE.md)，再选你的客户端。
 MCP 是工具协议，不是把 Markdown 指南粘贴到聊天后就获得本机权限。

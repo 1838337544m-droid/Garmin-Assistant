@@ -21,4 +21,16 @@ jobs:
       - run: python -m pytest -q
       - run: python scripts/check_release.py
       - run: python -m build
+      - run: python scripts/build_installer.py
+      - run: python scripts/release_assets.py
+      - name: Smoke-test isolated Windows installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $version = python -c "from garmin_assistant import __version__; print(__version__)"
+          $unpacked = Join-Path $env:RUNNER_TEMP 'Garmin installer files'
+          Expand-Archive -LiteralPath "dist/Garmin-Assistant-$version-Windows-Installer.zip" -DestinationPath $unpacked
+          $script = Join-Path $unpacked "Garmin-Assistant-$version/Install.ps1"
+          & $script -SkipSetup -InstallRoot (Join-Path $env:RUNNER_TEMP 'Garmin install 中文') -PythonExecutable (Get-Command python).Source
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - run: python -m pip check

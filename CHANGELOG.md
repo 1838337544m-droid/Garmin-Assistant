@@ -3,6 +3,15 @@
 
 ## English version
 
+### 0.1.4 — Guided local installation
+
+- Added English/Chinese AI installation prompts and two README entry points.
+- Added a Windows release ZIP: double-click launcher, Python/Tk detection, optional per-user WinGet install and versioned venv.
+- Added a local setup wizard for language, masked API key, timezone and running goal.
+- Added backup-preserving Claude configuration and Codex CLI registration; Doubao remains conditional config export.
+- Added a separate live Garmin check, Start-menu setup shortcut and installer CI smoke checks.
+- Core menu and training/data behavior are unchanged. The unsigned script installer is not an official store extension.
+
 ### 0.1.3 — 2026-10-31
 
 - Reorganized public documentation into English-first and Chinese-second sections.
@@ -34,6 +43,15 @@
 ---
 
 ## 中文版本
+
+### 0.1.4 — 本地引导安装
+
+- 新增中英双语 AI 安装指令和 README 两个安装入口。
+- 新增 Windows 发布 ZIP：双击启动、检查 Python/Tk、可选为当前用户通过 WinGet 安装 Python，使用独立版本环境。
+- 新增本地设置窗口：语言、隐藏密钥输入、时区和跑步目标。
+- Claude 配置合并和 Codex CLI 接入前备份；豆包仍为取决于客户端支持情况的配置导出。
+- 新增独立 Garmin 连接检查、开始菜单设置快捷方式和安装器 CI 冒烟检查。
+- 核心菜单及训练／数据逻辑不变。安装包是未签名脚本，不是平台官方商店扩展。
 
 ## 0.1.3 — 2026-10-31
 

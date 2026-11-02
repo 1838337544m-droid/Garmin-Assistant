@@ -19,6 +19,7 @@ jobs:
         run: |
           python -c "import os; from garmin_assistant import __version__; assert os.environ['GITHUB_REF_NAME'] == 'v'+__version__"
       - run: python -m build
+      - run: python scripts/build_installer.py
       - run: python scripts/release_assets.py
       - name: Create release and upload artifacts
         env:

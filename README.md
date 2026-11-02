@@ -3,6 +3,17 @@
 
 ## English version
 
+### Start here — no coding needed
+
+**[Install with AI](docs/INSTALL_WITH_AI.md#english-version)** ·
+**[Download Windows installer](https://github.com/1838337544m-droid/garmin-assistant-api/releases/latest)** ·
+**[Step-by-step setup](docs/EASY_INSTALL.md#english-version)**
+
+With a local AI agent, copy the installation prompt. Otherwise download the release's
+**Windows-Installer.zip**, extract all files and double-click **Install.cmd**.
+The local setup window lets you choose English/中文, enter your key privately and select a client.
+Internet is required. Ordinary web chats cannot install local software by receiving a prompt.
+
 Use your own Garmin Personal API key to sync activity and health data locally,
 then ask an AI for running and recovery guidance with research citations and classic training frameworks.
 
@@ -120,6 +131,16 @@ See [verification scope](docs/REFERENCES.md) and [self-check records](docs/SELF_
 ---
 
 ## 中文版本
+
+### 从这里开始：不需要懂代码
+
+**[交给 AI 安装](docs/INSTALL_WITH_AI.md#中文版本)** ·
+**[下载 Windows 安装包](https://github.com/1838337544m-droid/garmin-assistant-api/releases/latest)** ·
+**[一步步安装说明](docs/EASY_INSTALL.md#中文版本)**
+
+如果 AI 能操作你的电脑，复制安装指令即可；否则在发布页下载 **Windows-Installer.zip**，
+完整解压后双击 **Install.cmd**。本地窗口会让你选择中文／English、私密输入密钥并选择客户端。
+安装需要联网；普通网页聊天不能只凭收到一段指令就在电脑上安装软件。
 
 用自己的 Garmin Personal API 密钥，在本机同步运动与健康数据，让 AI 结合
 长跑训练、恢复研究和经典模型提供有出处的建议。
