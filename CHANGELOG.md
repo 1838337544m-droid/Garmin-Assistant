@@ -7,6 +7,7 @@
 
 - Added the four-item primary menu, 30-day training and 90-day health reports, and personal recovery reports with citations and missing-data coverage.
 - Added a next-day plan for swimming, cycling and running with user-selected distance and time. The original seven-command menu and previous tool interfaces remain available.
+- Setup saves the selected goal sport, distance and time. Tomorrow's plan can reuse it or accept a one-off goal.
 
 ### 0.1.8 — Windows redirected settings files
 
@@ -72,6 +73,7 @@
 
 - 新增四项主菜单、30 天运动及 90 天身体状态报告，以及标明出处和缺测项的个人恢复报告。
 - 明日建议支持游泳、自行车、跑步，由用户选择目标距离和时间。原七项菜单与原工具接口仍可用。
+- 初始设置先选项目，再保存目标距离和时间。明日建议可以沿用已保存目标，也可以临时改选。
 
 ### 0.1.8 — Windows 重定向设置文件
 

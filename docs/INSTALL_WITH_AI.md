@@ -28,7 +28,7 @@ using that venv's Python. Do not use sudo or modify system Python. Launch the in
 unavailable, explain the missing requirement and link the manual guide; never ask for my API key
 in chat or send a key through terminal automation, arguments or transcripts.
 
-Let ME choose English/中文, timezone, goal and AI client and enter my own key only in the masked
+Let ME choose English/中文, timezone, a goal sport (swimming, cycling or running), distance, time and AI client and enter my own key only in the masked
 local setup window. Never request, read, echo, transmit or commit my key/health data. Do not read
 existing private credential files. Do not start public tunnels. The setup wizard preserves and
 backs up client config and requires confirmation before replacing an existing Garmin entry.
@@ -75,7 +75,7 @@ macOS/Linux：使用独立的个人应用目录和 Python 3.12/3.13。下载同�
 打开一个我能看到的本地图形窗口。若缺少 Tk 或图形桌面，请解释所缺条件并给手动安装说明；
 不要通过聊天、终端自动输入、命令参数或操作记录向我索取／传递 API 密钥。
 
-让我在本地窗口选择中文／English、时区、跑步目标和客户端，并只在隐藏输入框填写自己的
+让我在本地窗口选择中文／English、时区、目标项目（游泳、自行车或跑步）、距离、时间和客户端，并只在隐藏输入框填写自己的
 API 密钥。不要索取、读取、打印、上传或提交我的密钥和健康数据，不读取原有私密凭据文件，
 不创建公网隧道。设置窗口会保留并备份客户端配置，替换已有佳明条目前需要我的明确选择。
 如果图形窗口会阻塞你的命令工具，请按用户交互应用方式启动。

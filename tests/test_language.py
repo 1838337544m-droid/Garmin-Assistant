@@ -127,6 +127,11 @@ def test_mcp_onboarding_blocks_health_read_then_returns_english_menu():
                 assert 'data' not in initial
                 selected=await call('garmin_set_language',{'language':'en'})
                 assert selected['language']=='en'
+                assert selected['goal_selection_required']
+                assert {entry['sport'] for entry in selected['goal_sports']} == {'swimming','cycling','running'}
+                saved=await call('garmin_set_goal',{'sport':'swimming','goal_distance_km':1.5,'goal_minutes':30})
+                assert saved['goal']=={'sport':'swimming','distance_km':1.5,'minutes':30}
+                assert (await call('garmin_status',{}))['goal']==saved['goal']
                 menu=await call('garmin_function_menu',{})
                 assert menu['function_menu'][0]['command']=='Sync data'
                 assert not menu['language_selection_required']

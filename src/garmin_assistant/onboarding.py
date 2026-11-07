@@ -1,6 +1,7 @@
 """Bilingual first-use prompt and localized presentation. Garmin payloads stay untouched."""
 from functools import wraps
 from .config import load_settings, save_settings
+from .goals import SPORTS
 
 WELCOME_TEXT=('欢迎首次使用佳明助手！\nWelcome to Garmin Assistant!\n\n'
               '请选择语言 / Please choose your language:\n1. 中文\n2. English')
@@ -12,6 +13,9 @@ def welcome(settings=None):
     return {'language':settings.language,'language_selection_required':required,
             'message':WELCOME_TEXT if required else ('欢迎回来，佳明助手已准备就绪。' if settings.language=='zh' else 'Welcome back. Garmin Assistant is ready.'),
             'choices':[{'id':1,'label':'中文','language':'zh'},{'id':2,'label':'English','language':'en'}],
+            'goal': settings.goal if not required else None,
+            'goal_selection_required': not required and settings.goal is None,
+            'goal_sports': [{'sport': sport, 'label': labels[settings.language=='en']} for sport,labels in SPORTS.items()] if not required else [],
             'next_step':'Reply 1/中文 or 2/English; the AI must call garmin_set_language with zh or en. Do not interpret the first number as a core-menu action until language is selected.' if required else None}
 
 
@@ -92,7 +96,7 @@ def localize_result(result,language):
             'Build a consistent, recoverable routine before adding limited quality sessions. Avoid stacking harder days.',
             'Time to your goal depends on current ability; wearable data cannot guarantee the fastest completion date.']
     if 'sync' in out:out['sync']=localize_result(out['sync'],language)
-    if 'race_pace' in out.get('goal',{}):out['goal']={**out['goal'],'race_pace':out['goal']['race_pace'].replace('略快于 ','faster than ')}
+    if out.get('goal') and 'race_pace' in out['goal']:out['goal']={**out['goal'],'race_pace':out['goal']['race_pace'].replace('略快于 ','faster than ')}
     if 'classic_models' in out:
         out['classic_models']=[{**m,'name':m['title'],'application':SOURCE_EN.get(m['id'],m['application'])} for m in out['classic_models']]
     if 'reviewed_sources' in out:

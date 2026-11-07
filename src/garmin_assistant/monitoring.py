@@ -4,12 +4,7 @@ from datetime import date, timedelta
 from statistics import median, quantiles
 
 from .readiness import number, object_or_empty
-
-SPORTS = {
-    'swimming': ('游泳', 'swimming'),
-    'cycling': ('自行车', 'cycling'),
-    'running': ('跑步', 'running'),
-}
+from .goals import SPORTS, validate_goal
 RECOVERY_SOURCES = [
     {'id': 'kellmann2018', 'title': 'Recovery and Performance in Sport: Consensus Statement', 'year': 2018,
      'url': 'https://pubmed.ncbi.nlm.nih.gov/29345524/'},
@@ -198,14 +193,6 @@ def recovery_status(history, as_of, subjective, fresh, language):
                        'min_recent_observations': 3, 'subjective_caution_0_10': 7,
                        'note': ('个人中间 50% 区间和 7 分自评是本应用的描述与保守提示。训练时长描述训练量，血氧单列。恢复速度需要同类训练后的多次随访。'
                                 if language == 'zh' else 'Personal middle-50% bands and the 7/10 rating are descriptive and conservative app rules. Duration describes volume, SpO₂ is contextual, and recovery speed needs repeated comparable post-training observations.')}}
-
-
-def validate_goal(sport, distance_km, minutes):
-    limits = {'swimming': 100, 'cycling': 1000, 'running': 200}
-    if sport not in limits or not number(distance_km) or not 0 < distance_km <= limits[sport]:
-        raise ValueError('Choose a supported sport and a positive target distance in km')
-    if not number(minutes) or not 0 < minutes <= 1440:
-        raise ValueError('Target time must be positive and at most 1440 minutes')
 
 
 def tomorrow_plan(history, as_of, sport, distance_km, minutes, subjective, fresh, language):

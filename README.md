@@ -51,7 +51,8 @@ python -m venv .venv
 ```
 
 Set your own IANA timezone rather than copying the example blindly. Default is UTC.
-The initial goal is 10 km in under 60 minutes; change it with `--goal-km` and `--goal-minutes`.
+In setup, choose swimming, cycling or running, then enter your target distance and time. From the
+CLI, use `init --sport swimming --goal-km 1.5 --goal-minutes 30` to save a 1,500 m swim goal.
 For complete Windows and macOS/Linux instructions, see the [beginner user guide](docs/USER_GUIDE.md).
 
 Run authentication **separately**:
@@ -203,8 +204,9 @@ python -m venv .venv
 粘贴到 AI 聊天中，也不要把 `auth` 和检查命令一起粘贴。
 不熟悉命令行请按[零基础分步说明](docs/USER_GUIDE.md#第四步输入个人密钥最容易误解的一步)操作。
 
-默认目标为 10 公里/60 分钟，可在
-`init` 中用 `--goal-km`、`--goal-minutes` 修改。请配置自己的时区（默认 UTC）。
+初始设置先选游泳、自行车或跑步，再填写距离和时间。命令行可用
+`init --sport swimming --goal-km 1.5 --goal-minutes 30` 保存 1500 米游泳目标。
+请配置自己的时区（默认 UTC）。
 macOS/Linux 对应命令与说明见[用户手册](docs/USER_GUIDE.md)。
 
 ## 功能菜单

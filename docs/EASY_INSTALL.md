@@ -33,7 +33,7 @@ the instructions; it must follow its own permission prompts.
    Paste it in the masked key field in the setup window. On later runs leave it blank to retain
    the stored key. This is an API key, not your Garmin account password.
 8. Enter your IANA timezone, e.g. `America/New_York`, `Europe/London`, `Asia/Dubai`, or `Asia/Shanghai`.
-   Default UTC is displayed, not a detected local timezone. Set your own running goal.
+   Choose swimming, cycling or running for your goal, then enter distance and target time in minutes. Use metres for swimming and kilometres for cycling and running.
 9. Select the client below and click **Save and connect**. Settings and the key are stored locally.
 10. Click **Save and check Garmin** to verify the API key and live read independently of the AI client.
 11. Restart the AI client. Say **Start Garmin Assistant**, then **Show function menu**.
@@ -127,7 +127,7 @@ AI 按说明安装本地程序并打开设置窗口，你只在这个窗口填�
    粘贴到设置窗口的密钥输入框，字符会被隐藏。以后修改设置时留空会保留已有密钥。
    此处填写 API 密钥，不是 Garmin 账号密码。
 8. 填写 IANA 时区，例如中国 `Asia/Shanghai`、迪拜 `Asia/Dubai`、纽约 `America/New_York`。
-   显示的默认 UTC 不是自动识别结果，请自行设置，并确认跑步目标。
+   先选择游泳、自行车或跑步，再填写距离和目标时间（分钟）。游泳以米为单位，自行车和跑步以公里为单位。
 9. 选择下面说明的客户端，点击“**保存并接入**”，配置和密钥会保存在本机。
 10. 点击“**保存并检查 Garmin**”，独立于 AI 客户端验证密钥并实时读取数据。
 11. 重启 AI 客户端，输入“**启动佳明助手**”，然后输入“**显示功能菜单**”。

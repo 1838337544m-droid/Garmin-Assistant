@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from .research import atomic_json
+from .goals import validate_goal
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,7 @@ class Settings:
     goal_distance_km: float = 10
     goal_minutes: float = 60
     language: str | None = None
+    goal_sport: str | None = None
 
     @property
     def key_file(self):
@@ -23,7 +25,9 @@ class Settings:
 
     @property
     def goal(self):
-        return {'distance_km':self.goal_distance_km,'minutes':self.goal_minutes}
+        if self.goal_sport is None:
+            return None
+        return {'sport':self.goal_sport,'distance_km':self.goal_distance_km,'minutes':self.goal_minutes}
 
 
 def load_settings():
@@ -38,7 +42,8 @@ def load_settings():
     path=folder/'settings.json'
     raw=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     if raw.get('schema_version',1)!=1:raise ValueError('Unsupported settings schema; use a compatible release')
-    settings=Settings(folder,timezone=raw.get('timezone','UTC'),goal_distance_km=raw.get('goal_distance_km',10),goal_minutes=raw.get('goal_minutes',60),language=raw.get('language'))
+    previous_sport = 'running' if 'goal_distance_km' in raw else None
+    settings=Settings(folder,timezone=raw.get('timezone','UTC'),goal_distance_km=raw.get('goal_distance_km',10),goal_minutes=raw.get('goal_minutes',60),language=raw.get('language'),goal_sport=raw.get('goal_sport',previous_sport))
     validate(settings)
     return settings
 
@@ -47,16 +52,17 @@ def validate(settings):
     if settings.language not in (None,'zh','en'):raise ValueError('Language must be zh or en')
     try:ZoneInfo(settings.timezone)
     except (ZoneInfoNotFoundError,ValueError,TypeError):raise ValueError('Invalid IANA timezone') from None
-    for name,value,limit in [('distance',settings.goal_distance_km,200),('minutes',settings.goal_minutes,1440)]:
-        if type(value) not in (int,float) or not 0<value<=limit:raise ValueError(f'Invalid goal {name}')
+    validate_goal(settings.goal_sport if settings.goal_sport is not None else 'running', settings.goal_distance_km, settings.goal_minutes)
 
 
 def save_settings(settings,**changes):
-    unknown=set(changes)-{'timezone','goal_distance_km','goal_minutes','language'}
+    unknown=set(changes)-{'timezone','goal_distance_km','goal_minutes','goal_sport','language'}
     if unknown:raise ValueError('Unknown settings field')
+    if 'goal_sport' not in changes and settings.goal_sport is None and {'goal_distance_km','goal_minutes'} & changes.keys():
+        changes['goal_sport']='running'
     updated=replace(settings,**changes);validate(updated)
     atomic_json(settings.data_dir/'settings.json',{'schema_version':1,'timezone':updated.timezone,
-        'goal_distance_km':updated.goal_distance_km,'goal_minutes':updated.goal_minutes,'language':updated.language})
+        'goal_distance_km':updated.goal_distance_km,'goal_minutes':updated.goal_minutes,'goal_sport':updated.goal_sport,'language':updated.language})
     return updated
 
 

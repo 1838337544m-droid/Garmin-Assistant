@@ -4,6 +4,7 @@ import pytest
 
 from garmin_assistant.monitoring import recovery_status, tomorrow_plan, training_status
 from garmin_assistant.training import TrainingWorkflow
+from garmin_assistant.config import load_settings, save_settings
 
 
 AS_OF = '2026-11-07'
@@ -88,3 +89,12 @@ def test_training_workflow_syncs_once_and_saves_multisport_report(tmp_path, monk
 def test_plan_rejects_nonboolean_symptom_input():
     with pytest.raises(ValueError, match='boolean'):
         tomorrow_plan(healthy_history(), AS_OF, 'cycling', 20, 50, {'chest_pain': 1}, True, 'en')
+
+
+def test_initial_goal_is_explicit_and_legacy_running_goal_migrates():
+    settings = load_settings()
+    assert settings.goal is None
+    (settings.data_dir / 'settings.json').write_text('{"schema_version":1,"goal_distance_km":10,"goal_minutes":60}', encoding='utf-8')
+    assert load_settings().goal == {'sport': 'running', 'distance_km': 10, 'minutes': 60}
+    save_settings(load_settings(), goal_sport='cycling', goal_distance_km=250, goal_minutes=480)
+    assert load_settings().goal == {'sport': 'cycling', 'distance_km': 250, 'minutes': 480}

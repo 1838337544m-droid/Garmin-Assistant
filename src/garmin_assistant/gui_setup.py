@@ -10,6 +10,7 @@ from tkinter import filedialog, messagebox, ttk
 
 from . import __version__
 from .config import load_settings
+from .goals import SPORTS
 from .menu import MenuStore
 from .onboarding import localize_result
 from .research import atomic_json
@@ -25,7 +26,7 @@ SETUP_MESSAGES = {
     'missing_config_path': ('Choose the Claude configuration file opened by Edit Config.', '请选择 Claude“编辑配置”打开的配置文件。'),
     'missing_codex': ('Codex CLI was not found. Install it or choose another client.', '找不到 Codex CLI。请安装它或选择其他客户端。'),
     'codex_registration_failed': ('Codex rejected the MCP registration. Check the Codex CLI configuration.', 'Codex 拒绝注册 MCP。请检查 Codex CLI 配置。'),
-    'invalid_settings': ('Check the IANA timezone and positive running goal values.', '请检查 IANA 时区，并填写大于零的跑步目标。'),
+    'invalid_settings': ('Check the IANA timezone and enter a valid target distance and time.', '请检查 IANA 时区，并填写有效的目标距离与时间。'),
     'invalid_key_format': ('Paste one Garmin API key without internal spaces or line breaks.', '请粘贴一条完整的 Garmin API 密钥，密钥内部不能有空格或换行。'),
     'missing_key': ('No saved Garmin API key was found for this installation. Enter it in the key field.', '当前安装没有找到已保存的 Garmin API 密钥。请在密钥栏填写。'),
 }
@@ -34,7 +35,7 @@ SETUP_MESSAGES = {
 class SetupWindow:
     def __init__(self,root):
         self.root=root;self.settings=load_settings();self.events=queue.Queue();self.busy=False
-        root.title(f'Garmin Assistant | 佳明助手 {__version__}');root.geometry('780x720');root.minsize(680,650)
+        root.title(f'Garmin Assistant | 佳明助手 {__version__}');root.geometry('780x760');root.minsize(680,650)
         self.frame=ttk.Frame(root,padding=20);self.frame.pack(fill='both',expand=True)
         ttk.Label(self.frame,text='Welcome to Garmin Assistant!\n欢迎首次使用佳明助手！',font=('',17),justify='center').pack(pady=30)
         ttk.Label(self.frame,text='Please choose your language / 请选择语言').pack(pady=15)
@@ -51,15 +52,30 @@ class SetupWindow:
         ttk.Label(self.frame,text=self.text('Your key stays on this computer. Never paste it into AI chat.','密钥保存在本机，请不要发送到 AI 聊天里。')).pack(anchor='w',pady=8)
         self.values={}
         fields=[('key','Garmin Personal API key (leave blank to keep existing)','Garmin API 密钥（已保存可留空）',''),
-                ('timezone','IANA timezone, e.g. Asia/Dubai or America/New_York','IANA 时区，例如 Asia/Shanghai 或 Asia/Dubai',self.settings.timezone),
-                ('distance','Running goal: distance in km','跑步目标：距离（公里）',str(self.settings.goal_distance_km)),
-                ('minutes','Running goal: finish time in minutes','跑步目标：完成时间（分钟）',str(self.settings.goal_minutes))]
+                ('timezone','IANA timezone, e.g. Asia/Dubai or America/New_York','IANA 时区，例如 Asia/Shanghai 或 Asia/Dubai',self.settings.timezone)]
         for name,en,zh,value in fields:
             ttk.Label(self.frame,text=self.text(en,zh)).pack(anchor='w',pady=(7,0))
             var=tk.StringVar(value=value);self.values[name]=var
             entry=ttk.Entry(self.frame,textvariable=var,show='*' if name=='key' else '')
             entry.pack(fill='x')
             if name=='key':self.key_entry=entry
+        ttk.Label(self.frame,text=self.text('Choose your goal sport','选择目标运动项目')).pack(anchor='w',pady=(7,0))
+        self.sport_labels={self.text(en,zh):code for code,(zh,en) in SPORTS.items()}
+        self.goal_choice=tk.StringVar()
+        sport_picker=ttk.Combobox(self.frame,textvariable=self.goal_choice,state='readonly',values=list(self.sport_labels))
+        sport_picker.pack(fill='x')
+        self.distance_label=ttk.Label(self.frame);self.distance_label.pack(anchor='w',pady=(7,0))
+        self.values['distance']=tk.StringVar()
+        self.distance_entry=ttk.Entry(self.frame,textvariable=self.values['distance']);self.distance_entry.pack(fill='x')
+        ttk.Label(self.frame,text=self.text('Target time (minutes)','目标时间（分钟）')).pack(anchor='w',pady=(7,0))
+        self.values['minutes']=tk.StringVar()
+        self.minutes_entry=ttk.Entry(self.frame,textvariable=self.values['minutes']);self.minutes_entry.pack(fill='x')
+        self.goal_sport=None
+        if self.settings.goal_sport:
+            zh,en=SPORTS[self.settings.goal_sport]
+            self.goal_choice.set(self.text(en,zh))
+        self.goal_selected(use_saved=True)
+        sport_picker.bind('<<ComboboxSelected>>',lambda event:self.goal_selected())
         ttk.Button(self.frame,text=self.text('Open Garmin key page','打开 Garmin 密钥页面'),command=lambda:webbrowser.open('https://connect.garmin.com/app/settings/personalApiToken')).pack(anchor='w',pady=5)
         ttk.Label(self.frame,text=self.text('AI client','AI 客户端')).pack(anchor='w')
         self.client=tk.StringVar(value='Claude Desktop')
@@ -76,6 +92,24 @@ class SetupWindow:
         self.output=tk.Text(self.frame,height=8,wrap='word');self.output.pack(fill='both',expand=True)
         self.show(self.text('Save and check Garmin to verify your key independently. Save and connect to configure the selected AI client.','点“保存并检查 Garmin”单独验证密钥。点“保存并接入”配置所选 AI 客户端。'))
 
+    def goal_selected(self,use_saved=False):
+        sport=self.sport_labels.get(self.goal_choice.get())
+        if sport != self.goal_sport:
+            self.values['distance'].set('')
+            self.values['minutes'].set('')
+        self.goal_sport=sport
+        state='normal' if sport else 'disabled'
+        self.distance_entry.configure(state=state)
+        self.minutes_entry.configure(state=state)
+        if sport=='swimming':
+            self.distance_label.configure(text=self.text('Target distance (metres)','目标距离（米）'))
+        else:
+            self.distance_label.configure(text=self.text('Target distance (kilometres)','目标距离（公里）'))
+        if use_saved and sport:
+            factor=1000 if sport=='swimming' else 1
+            self.values['distance'].set(f'{self.settings.goal_distance_km * factor:g}')
+            self.values['minutes'].set(f'{self.settings.goal_minutes:g}')
+
     def browse(self):
         path=filedialog.asksaveasfilename(initialfile='claude_desktop_config.json',filetypes=[('JSON','*.json')],confirmoverwrite=False)
         if path:self.path.set(path)
@@ -85,6 +119,10 @@ class SetupWindow:
 
     def work(self,operation):
         if self.busy:return
+        sport=self.goal_sport
+        if not sport:
+            self.show(self.text('Choose swimming, cycling or running before entering your goal.','请先选择游泳、自行车或跑步，再填写目标。'))
+            return
         values={key:field.get() for key,field in self.values.items()}
         self.busy=True;self.save_button.configure(state='disabled');self.check_button.configure(state='disabled')
         self.key_entry.configure(state='disabled')
@@ -92,7 +130,11 @@ class SetupWindow:
         def run():
             saved=None
             try:
-                saved=configure(self.settings,self.language,values['timezone'],values['distance'],values['minutes'],values['key'])
+                try:
+                    distance=float(values['distance']) / (1000 if sport=='swimming' else 1)
+                except ValueError:
+                    raise SetupIssue('invalid_settings') from None
+                saved=configure(self.settings,self.language,values['timezone'],distance,values['minutes'],values['key'],goal_sport=sport)
                 self.events.put((saved,True,operation(saved)))
                 return
             except SetupIssue as exc:

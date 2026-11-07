@@ -7,7 +7,8 @@ from .readiness import assess
 from .research import REVIEWED, CLASSIC_MODELS, atomic_json, update_research
 from .sync import SyncManager, local_today
 from .menu import core_menu
-from .monitoring import recovery_status, render_monitoring_report, tomorrow_plan, training_status, validate_goal
+from .monitoring import recovery_status, render_monitoring_report, tomorrow_plan, training_status
+from .goals import validate_goal
 from zoneinfo import ZoneInfo
 
 
@@ -91,7 +92,7 @@ class TrainingWorkflow:
                   {'status':'reviewed_only','rules_reviewed_on':'2026-10-28','reviewed_sources':REVIEWED,
                    'checked_on':None,'candidates':[],'error':'Research discovery skipped'})
         result=assess(history,as_of,subjective=subjective,planned_km=planned_km,sync_ok=synced['fresh'],
-                      goal=self.settings.goal if self.settings else None)
+                      goal=self.settings.goal if self.settings and self.settings.goal_sport == 'running' else None)
         result.update({'source':'Garmin official Personal API','sync':synced,'research':evidence,
                        'classic_models':CLASSIC_MODELS,'function_menu':core_menu(),
                        'generated_at':datetime.now(timezone.utc).isoformat()})

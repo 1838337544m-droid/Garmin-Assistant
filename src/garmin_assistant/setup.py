@@ -109,10 +109,11 @@ def connect_codex(settings,replace=False):
     return backup
 
 
-def configure(settings,language,timezone,distance,minutes,key):
+def configure(settings,language,timezone,distance,minutes,key,goal_sport=None):
     from dataclasses import replace
     try:
-        changes=dict(language=language,timezone=timezone.strip(),goal_distance_km=float(distance),goal_minutes=float(minutes))
+        changes=dict(language=language,timezone=timezone.strip(),goal_distance_km=float(distance),goal_minutes=float(minutes),
+                     goal_sport=goal_sport or settings.goal_sport or 'running')
         validate(replace(settings,**changes))
     except ValueError:
         raise SetupIssue('invalid_settings') from None

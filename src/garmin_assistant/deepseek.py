@@ -10,7 +10,8 @@ import httpx
 
 from .menu import MenuStore, RESTORE_COMMAND
 from .onboarding import choose_language, localize_result, welcome
-from .monitoring import SPORTS, validate_goal
+from .config import load_settings, save_settings
+from .goals import SPORTS, validate_goal
 
 MODELS = ('deepseek-flash', 'deepseek-v4-pro')
 ENDPOINT = 'https://api.deepseek.com/chat/completions'
@@ -104,11 +105,22 @@ def show_menu(store, language, restore=False):
     return menu
 
 
-def ask_training_goal(zh):
+def ask_training_goal(zh, saved_goal=None):
     sports = list(SPORTS)
+    if saved_goal:
+        sport = saved_goal['sport']
+        distance = saved_goal['distance_km'] * (1000 if sport == 'swimming' else 1)
+        unit = 'm' if sport == 'swimming' else 'km'
+        print(f"{SPORTS[sport][not zh]} · {distance:g} {unit} · {saved_goal['minutes']:g} min")
     for index, sport in enumerate(sports, 1):
         print(f'{index}. {SPORTS[sport][not zh]}')
-    choice = input('选择运动项目（回车取消） ' if zh else 'Choose a sport (Enter to cancel) ').strip()
+    if saved_goal:
+        prompt = '选择新项目，或按回车使用已保存目标 ' if zh else 'Choose a new sport or press Enter to use the saved goal '
+    else:
+        prompt = '选择运动项目（回车跳过） ' if zh else 'Choose a sport (Enter to skip) '
+    choice = input(prompt).strip()
+    if not choice and saved_goal:
+        return saved_goal['sport'], saved_goal['distance_km'], saved_goal['minutes']
     if choice not in ('1', '2', '3'):
         return None
     sport = sports[int(choice) - 1]
@@ -119,9 +131,9 @@ def ask_training_goal(zh):
         km = distance / 1000 if sport == 'swimming' else distance
         validate_goal(sport, km, minutes)
     except ValueError:
-        print('目标无效，请重新选择 4 后填写。' if zh else 'Invalid goal. Choose 4 again to retry.')
+        print('目标无效，可在设置中重填或选择 4 重试。' if zh else 'Invalid goal. Update it in setup or choose 4 to retry.')
         return None
-    return f"4. Tomorrow's training plan. Selected sport: {sport}; target: {km:g} km in {minutes:g} minutes. Ask for any missing symptom inputs."
+    return sport, km, minutes
 
 
 async def chat(settings, model, api_key):
@@ -155,8 +167,11 @@ async def chat(settings, model, api_key):
                 if question == str(item['id']):
                     question = f"{item['id']}. {item['command']}"
                     if item.get('tool') == 'garmin_plan_tomorrow':
-                        question = ask_training_goal(zh)
-                        cancelled = question is None
+                        goal = ask_training_goal(zh, load_settings().goal)
+                        cancelled = goal is None
+                        if goal:
+                            sport, km, minutes = goal
+                            question = f"4. Tomorrow's training plan. Sport {sport}, goal {km:g} km in {minutes:g} minutes. Ask for missing symptoms."
                     elif item.get('tool'):
                         question += f"\nSelected menu tool: {item['tool']}"
                     if item['id'] >= 100:
@@ -192,6 +207,12 @@ def run(settings, model=None):
             print(welcome(settings)['message'])
             settings = choose_language(input('1 / 2: '))
         zh = settings.language == 'zh'
+        if settings.goal is None:
+            print('先选择要保存的运动目标。' if zh else 'Choose the training goal to save.')
+            goal = ask_training_goal(zh)
+            if goal:
+                sport, km, minutes = goal
+                settings = save_settings(settings, goal_sport=sport, goal_distance_km=km, goal_minutes=minutes)
         if model is None:
             print('1. DeepSeek Flash\n2. DeepSeek V4 Pro')
             selection = input('选择模型 [1/2，默认 1]: ' if zh else 'Choose a model [1/2, default 1]: ').strip()

@@ -6,6 +6,7 @@ import os
 import sys
 from . import __version__, TITLE
 from .config import load_settings, save_settings, save_api_key
+from .goals import SPORTS
 from .menu import MenuStore, RESTORE_COMMAND
 from .onboarding import welcome,choose_language,localize_result,WELCOME_TEXT
 
@@ -24,6 +25,7 @@ def main():
     deepseek.add_argument('--model',choices=['deepseek-flash','deepseek-v4-pro'])
     init=commands.add_parser('init');init.add_argument('--timezone',default=None);init.add_argument('--goal-km',type=float);init.add_argument('--goal-minutes',type=float)
     init.add_argument('--language',choices=['zh','en'])
+    init.add_argument('--sport',choices=SPORTS,help='Choose the saved goal sport')
     commands.add_parser('welcome',help='Show bilingual welcome and language choices')
     language=commands.add_parser('language');language.add_argument('selection',nargs='?',help='zh/en, 中文/English, or 1/2')
     commands.add_parser('auth',help='Paste your personal API key in a hidden prompt')
@@ -33,8 +35,8 @@ def main():
     recovery=commands.add_parser('recovery',help='Compare personal trends and recovery ratings')
     recovery.add_argument('--fatigue',type=float);recovery.add_argument('--soreness',type=float)
     plan=commands.add_parser('plan',help='Plan swimming, cycling or running tomorrow')
-    plan.add_argument('--sport',choices=['swimming','cycling','running'],required=True)
-    plan.add_argument('--goal-km',type=float,required=True);plan.add_argument('--goal-minutes',type=float,required=True)
+    plan.add_argument('--sport',choices=SPORTS,help='Provide sport, distance and time to override the saved goal')
+    plan.add_argument('--goal-km',type=float);plan.add_argument('--goal-minutes',type=float)
     plan.add_argument('--subjective-json')
     tomorrow=commands.add_parser('tomorrow');tomorrow.add_argument('--no-sync',action='store_true');tomorrow.add_argument('--no-research',action='store_true');tomorrow.add_argument('--planned-km',type=float);tomorrow.add_argument('--subjective-json')
     commands.add_parser('research')
@@ -61,7 +63,9 @@ def main():
             settings=selected
             result=localize_result({**menus.view(),'message':'语言已设为中文。' if selected.language=='zh' else 'Language set to English.'},selected.language)
         elif args.command=='init':
-            changes={k:v for k,v in {'timezone':args.timezone,'goal_distance_km':args.goal_km,'goal_minutes':args.goal_minutes,'language':args.language}.items() if v is not None}
+            if args.sport and (args.goal_km is None or args.goal_minutes is None):
+                init.error('--sport requires --goal-km and --goal-minutes')
+            changes={k:v for k,v in {'timezone':args.timezone,'goal_distance_km':args.goal_km,'goal_minutes':args.goal_minutes,'goal_sport':args.sport,'language':args.language}.items() if v is not None}
             updated=save_settings(settings,**changes)
             settings=updated
             result={'title':TITLE,'version':__version__,'data_dir':str(updated.data_dir),'timezone':updated.timezone,'goal':updated.goal}
@@ -116,8 +120,13 @@ def main():
             elif args.command=='recovery':result=training.recovery_status({'fatigue_0_10':args.fatigue,'soreness_0_10':args.soreness})
             elif args.command=='plan':
                 from .server import PlanCheck
+                supplied=(args.sport,args.goal_km,args.goal_minutes)
+                if all(value is None for value in supplied) and settings.goal:
+                    supplied=(settings.goal_sport,settings.goal_distance_km,settings.goal_minutes)
+                if any(value is None for value in supplied):
+                    plan.error('Set a saved goal first or provide --sport, --goal-km and --goal-minutes together')
                 subjective=PlanCheck.model_validate_json(args.subjective_json).model_dump(exclude_none=True) if args.subjective_json else None
-                result=training.plan_tomorrow(args.sport,args.goal_km,args.goal_minutes,subjective)
+                result=training.plan_tomorrow(*supplied,subjective)
             elif args.command=='research':
                 from .research import update_research
                 result=update_research(DATA,today(),force=True)

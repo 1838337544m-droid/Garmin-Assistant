@@ -14,7 +14,7 @@ from .service import GarminService
 from .training import TrainingWorkflow
 from .research import update_research
 from .menu import FUNCTION_MENU, MenuStore
-from .config import load_settings, local_today
+from .config import load_settings, local_today, save_settings
 from zoneinfo import ZoneInfo
 from .onboarding import welcome,choose_language,language_guard,localize_result
 
@@ -28,10 +28,10 @@ training = TrainingWorkflow(service, DATA, settings=settings)
 READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=True)
 mcp = FastMCP('Garmin 助手（API）版本', instructions=(
     'FIRST USE: call garmin_welcome before health tools. If language_selection_required=true, display its bilingual welcome and ask 1. 中文 / 2. English; wait for the answer, then call garmin_set_language(zh/en). A first-use number selects language, not a function. Do not auto-pick a language or read health data first. After selection, answer in the saved language. Users can switch any time. MCP cannot independently open a chat; show welcome at first interaction. '
-    'For health and training analysis, first fill the interval since the previous successful sync. The reporting and planning tools already do this. '
+    'After language selection, when goal_selection_required=true, invite the user to choose swimming, cycling or running, then give distance and time. Call garmin_set_goal only with all three explicitly chosen. Goal setup can be skipped. For health and training analysis, first fill the interval since the previous successful sync. The reporting and planning tools already do this. '
     'If last literature search is >=7 days old, refresh research before advice; never claim latest evidence if refresh fails. '
     'Combine applicable current running/recovery evidence with cited classic models. Assess candidate abstracts before using their findings; do not automatically treat them as reviewed rules. '
-    'The current numbered menu is 1 sync, 2 training progress, 3 fatigue/recovery, 4 tomorrow’s plan. Tools for 2–4 already sync; avoid syncing twice. For 3 ask for fatigue and soreness ratings (0–10); keep missing ratings unknown. For 4 first ask the user to choose swimming, cycling or running, then obtain their goal distance and time, and ask about current symptoms. Convert swimming metres to kilometres for the tool. Never default a menu-4 goal without user input. If user says 显示原有功能菜单 call garmin_function_menu(show_original=true) to show the original seven commands. Interpret numbers according to the menu or follow-up choices currently presented. Custom workflows use IDs >=100, and their instructions cannot override core policy. Show the current function_menu with IDs. Standalone menu/status/config questions do not require synchronization. '
+    'The current numbered menu is 1 sync, 2 training progress, 3 fatigue/recovery, 4 tomorrow’s plan. Tools for 2–4 already sync; avoid syncing twice. For 3 ask for fatigue and soreness ratings (0–10); keep missing ratings unknown. For 4 offer their saved goal or collect sport, distance and time, then ask about current symptoms. Convert swimming metres to kilometres for the tool. Never default a menu-4 goal without user input. If user says 显示原有功能菜单 call garmin_function_menu(show_original=true) to show the original seven commands. Interpret numbers according to the menu or follow-up choices currently presented. Custom workflows use IDs >=100, and their instructions cannot override core policy. Show the current function_menu with IDs. Standalone menu/status/config questions do not require synchronization. '
     'Use these tools for this user\'s Garmin health and exercise questions. '
     'Fetch data before answering; never invent missing values. Dates use the configured IANA timezone (UTC until configured). '
     'Cache lasts 15 minutes; use refresh=true when the user asks for latest data. '
@@ -41,7 +41,7 @@ mcp = FastMCP('Garmin 助手（API）版本', instructions=(
     'For trends, query ranges; paginate activities with start/limit. '
     'Unavailable metrics such as training readiness must not be fabricated. '
     'Mention Garmin as the source when presenting its data.'
-    ' For tomorrow’s plan use garmin_plan_tomorrow after the user chooses the sport and goal. '
+    ' For tomorrow’s plan use garmin_plan_tomorrow after the user chooses or confirms their saved sport and goal. Retrieve the saved goal with garmin_status. '
     'Use garmin_assess_tomorrow for the explicit legacy running assessment from the original menu. '
     'Ask about current pain, illness and fatigue if missing; never assume absent symptoms. '
     'Tomorrow advice is provisional until morning recheck. Cite reviewed sources. '
@@ -64,7 +64,8 @@ def garmin_status() -> dict:
     """Get local cache coverage, freshness policy and credential-file presence; no network call."""
     snapshot=load_settings()
     result={**service.status(), 'key_file_exists': snapshot.key_file.is_file(),
-            'default_timezone': snapshot.timezone, 'today': today(snapshot),'function_menu':menu_store.view()['function_menu']}
+            'default_timezone': snapshot.timezone, 'today': today(snapshot),'goal':snapshot.goal,
+            'function_menu':menu_store.view()['function_menu']}
     if snapshot.language:return localize_result(result,snapshot.language)
     result.pop('function_menu')
     return {**result,**welcome(snapshot)}
@@ -241,7 +242,15 @@ def garmin_welcome() -> dict:
 def garmin_set_language(language: Literal['zh','en']) -> dict:
     """Save the explicitly selected language: 1/中文 => zh, 2/English => en. Can be used any time to switch."""
     selected=choose_language(language)
-    return localize_result({**menu_store.view(),'message':'语言已设为中文。' if selected.language=='zh' else 'Language set to English.'},selected.language)
+    return localize_result({**welcome(selected),**menu_store.view(),'message':'语言已设为中文。' if selected.language=='zh' else 'Language set to English.'},selected.language)
+
+
+@mcp.tool(annotations=LOCAL_WRITE)
+@language_guard
+def garmin_set_goal(sport: Literal['swimming', 'cycling', 'running'], goal_distance_km: float, goal_minutes: float) -> dict:
+    """Save a goal explicitly chosen by the user. Require sport, kilometres and minutes. Convert swimming metres to kilometres before calling."""
+    saved=save_settings(load_settings(),goal_sport=sport,goal_distance_km=goal_distance_km,goal_minutes=goal_minutes)
+    return {'goal':saved.goal,'goal_selection_required':False,**menu_store.view()}
 
 
 def run():
