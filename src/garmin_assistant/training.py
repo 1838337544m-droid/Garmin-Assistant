@@ -44,14 +44,16 @@ class TrainingWorkflow:
                        'function_menu': MenuStore(self.folder / 'menu-preferences.json').view()['function_menu']})
         self.report_folder.mkdir(parents=True, exist_ok=True)
         stem = f"{prefix}_{result.get('target_date', result['as_of'])}"
-        json_path = self.report_folder / f'{stem}.json'
-        markdown_path = json_path.with_suffix('.md')
-        result.update({'report_json': str(json_path), 'report_markdown': str(markdown_path)})
+        markdown_path = self.report_folder / f'{stem}.md'
         if language == 'en':
             from .onboarding import localize_result
             result = localize_result(result, language)
-        atomic_json(json_path, result)
         markdown_path.write_text(render_monitoring_report(result), encoding='utf-8')
+        # Resolve the written file so other apps can open it outside Store Python.
+        markdown_path = markdown_path.resolve(strict=True)
+        json_path = markdown_path.with_suffix('.json')
+        result.update({'report_json': str(json_path), 'report_markdown': str(markdown_path)})
+        atomic_json(json_path, result)
         return result
 
     def training_status(self):
