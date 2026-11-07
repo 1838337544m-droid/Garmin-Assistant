@@ -51,7 +51,7 @@ The GitHub release workflow uses the repository-provided GITHUB_TOKEN, not a sto
 ### Compatibility and rollback
 
 1. Patch releases fix issues; minor releases add compatible features. Core contracts/data-format breaks require major-version explanation.
-2. Current settings/menu schema is version 1; unknown versions must fail rather than clear preferences.
+2. Settings use schema 1 and the menu uses schema 2. Upgrading retains custom workflows and maps hidden sync and next-day items to the current menu.
 3. Keep old tags/releases. Back up data before rollback; older code is not guaranteed to read future formats.
 4. Clone an old tag into a separate directory, create its own `.venv`, and test against copied data before switching clients.
 5. Do not delete custom workflows, renumber core actions or move user extensions into source.
@@ -109,7 +109,7 @@ GitHub release workflow 仅需仓库自带的 GITHUB_TOKEN，不需要保存个�
 ## 兼容与回滚
 
 1. 补丁版本修复问题；次版本增加兼容功能；改变数据格式或核心契约需主版本说明。
-2. 当前 settings/menu schema_version 为 1；未知版本应报错而不是清空偏好。
+2. 本机设置使用格式版本 1，菜单使用格式版本 2。升级会保留自定义功能，并将旧版同步和明日建议的隐藏设置映射到新菜单。
 3. 保留旧版本标签和 Release。回滚前备份数据，不承诺新数据格式可由旧版读取。
 4. 可在新的目录克隆旧标签，另建 `.venv`，用副本数据测试后再切换客户端。
 5. 不自动删除用户自定义工作流，不重排核心编号，也不把扩展写入源码。

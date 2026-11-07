@@ -3,6 +3,11 @@
 
 ## English version
 
+### 0.2.0 — Multisport training and recovery
+
+- Added the four-item primary menu, 30-day training and 90-day health reports, and personal recovery reports with citations and missing-data coverage.
+- Added a next-day plan for swimming, cycling and running with user-selected distance and time. The original seven-command menu and previous tool interfaces remain available.
+
 ### 0.1.8 — Windows redirected settings files
 
 - Retry atomic settings and Claude configuration saves using resolved file paths when Windows Store Python reports a cross-volume rename for redirected files.
@@ -62,6 +67,11 @@
 ---
 
 ## 中文版本
+
+### 0.2.0 — 多项目训练与恢复
+
+- 新增四项主菜单、30 天运动及 90 天身体状态报告，以及标明出处和缺测项的个人恢复报告。
+- 明日建议支持游泳、自行车、跑步，由用户选择目标距离和时间。原七项菜单与原工具接口仍可用。
 
 ### 0.1.8 — Windows 重定向设置文件
 

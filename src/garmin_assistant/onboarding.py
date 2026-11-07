@@ -23,7 +23,7 @@ def choose_language(value):
     return settings
 
 
-MENU_EN={
+LEGACY_MENU_EN={
     1:('Sync data','Fill the interval since the previous sync and report gaps.'),
     2:("Assess tomorrow's training",'Sync first, then assess recovery and recent running against your goal.'),
     3:('View activities and details','Browse a date range or inspect one activity.'),
@@ -31,6 +31,13 @@ MENU_EN={
     5:('Compare steps, stress and Body Battery','Read date ranges for comparison.'),
     6:('Update running and rehabilitation research','Discover recent papers with citations and appraisal status.'),
     7:('View sync status and function menu','Check freshness or show the supported functions.'),
+}
+
+MENU_EN={
+    1:LEGACY_MENU_EN[1],
+    2:('Training progress and current status','Review 30-day activity frequency and metrics, plus 90-day health trends.'),
+    3:('Fatigue and recovery','Compare personal trends, reported fatigue and soreness, and recent training volume.'),
+    4:('Tomorrow’s training plan','Choose swimming, cycling or running, then set a target distance and time.'),
 }
 
 FLAG_EN={
@@ -61,12 +68,13 @@ def localize_result(result,language):
     out={**result,'language':language,'language_selection_required':False}
     if language!='en':return out
     if 'function_menu' in out:
-        out['function_menu']=[{**item,'command':MENU_EN[item['id']][0],'description':MENU_EN[item['id']][1]}
-            if item.get('id') in MENU_EN else dict(item) for item in out['function_menu']]
+        translations=LEGACY_MENU_EN if out.get('menu_variant')=='legacy' else MENU_EN
+        out['function_menu']=[{**item,'command':translations[item['id']][0],'description':translations[item['id']][1]}
+            if item.get('id') in translations else dict(item) for item in out['function_menu']]
     if 'restore_command' in out:out['restore_command']='Show original function menu / 显示原有功能菜单'
     if 'note' in out and 'function_menu' in out:out['note']='Hiding affects menu display only. Core tools remain available; custom items are user-authored prompt workflows.'
     if 'flags' in out:out['flags']=[{**f,'reason':FLAG_EN.get(f['code'],f['reason'])} for f in out['flags']]
-    if 'recommendation' in out:
+    if 'recommendation' in out and 'sport' not in out:
         minutes=out.get('suggested_easy_minutes',0)
         out['recommendation']={
             'avoid_running':'Do not run tomorrow. Address reported illness or pain first; walking pain or focal bone pain needs professional assessment.',
@@ -84,7 +92,7 @@ def localize_result(result,language):
             'Build a consistent, recoverable routine before adding limited quality sessions. Avoid stacking harder days.',
             'Time to your goal depends on current ability; wearable data cannot guarantee the fastest completion date.']
     if 'sync' in out:out['sync']=localize_result(out['sync'],language)
-    if 'goal' in out:out['goal']={**out['goal'],'race_pace':out['goal'].get('race_pace','').replace('略快于 ','faster than ')}
+    if 'race_pace' in out.get('goal',{}):out['goal']={**out['goal'],'race_pace':out['goal']['race_pace'].replace('略快于 ','faster than ')}
     if 'classic_models' in out:
         out['classic_models']=[{**m,'name':m['title'],'application':SOURCE_EN.get(m['id'],m['application'])} for m in out['classic_models']]
     if 'reviewed_sources' in out:

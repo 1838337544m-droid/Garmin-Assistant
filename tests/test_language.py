@@ -28,7 +28,7 @@ def test_english_menu_preserves_core_ids_and_custom_text():
     from garmin_assistant.menu import core_menu
     r=localize_result({'function_menu':core_menu()+[{'id':100,'command':'我的功能','description':'用户内容'}]},'en')
     assert r['function_menu'][0]['command']=='Sync data'
-    assert [x['id'] for x in r['function_menu'][:7]]==list(range(1,8))
+    assert [x['id'] for x in r['function_menu'][:4]]==list(range(1,5))
     assert r['function_menu'][-1]['command']=='我的功能'
 
 
@@ -116,7 +116,8 @@ def test_mcp_onboarding_blocks_health_read_then_returns_english_menu():
             async with ClientSession(*streams) as session:
                 init=await session.initialize()
                 assert 'garmin_welcome' in init.instructions
-                assert len((await session.list_tools()).tools)==18
+                assert {'garmin_training_status','garmin_recovery_status','garmin_plan_tomorrow','garmin_assess_tomorrow'} <= {
+                    tool.name for tool in (await session.list_tools()).tools}
                 async def call(name,args):
                     r=await session.call_tool(name,args)
                     assert not r.isError

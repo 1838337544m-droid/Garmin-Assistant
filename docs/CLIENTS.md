@@ -8,7 +8,7 @@
 1. Install Garmin Assistant v0.1.5 or later. In **Garmin Assistant Setup**, choose **DeepSeek API**, save your Garmin settings and check the Garmin connection.
 2. Open **Garmin Assistant DeepSeek** from the Windows Start menu. On macOS/Linux or a manual installation, run `garmin-assistant deepseek` from the installed environment.
 3. Choose **Flash** (`deepseek-flash`) or **V4 Pro** (`deepseek-v4-pro`). Type `yes` after reading the data-sharing notice, then enter your DeepSeek API key at the hidden terminal prompt. The key can also be supplied with `DEEPSEEK_API_KEY`.
-4. Select a numbered function or ask a question. Try **2** for tomorrow’s training assessment. Type `/quit` to exit.
+4. Select a numbered function or ask a question. Try **4** for tomorrow’s training plan. Type `/quit` to exit.
 
 This terminal client uses the DeepSeek API's non-thinking tool-calling mode. It sends recent chat history, relevant Garmin health and activity results (which may include location), and custom workflows you select by number. DeepSeek bills API usage to your account. Garmin and DeepSeek require separate credentials. Keep the Garmin key in local setup and enter the DeepSeek key only at the credential prompt. Your model key is held for the session. [DeepSeek API platform](https://platform.deepseek.com/) · [Official model and tool support](https://api-docs.deepseek.com/quick_start/pricing/)
 
@@ -132,9 +132,9 @@ snapshot. Core actions still execute through the local CLI or a connected MCP.
 
 1. `doctor` shows the version, your timezone and whether a key is configured.
 2. After language selection, `doctor --live` returns a successful Garmin read or explicit no-data status.
-3. First call `garmin_welcome` and choose a language; `garmin_function_menu` then shows IDs 1–7.
+3. First call `garmin_welcome` and choose a language; `garmin_function_menu` then shows IDs 1–4.
 4. Sync returns the gap dates and missing-record information.
-5. Add a custom function, hide 1–7, then request the original menu: it returns without deleting the extension.
+5. Add a custom function, hide 1–4, then request the original menu: it returns without deleting the extension.
 
 Only clients where these steps were actually completed count as end-to-end verified. A configuration
 example alone is not proof of client compatibility.
@@ -148,7 +148,7 @@ example alone is not proof of client compatibility.
 1. 安装佳明助手 v0.1.5 或更新版本。在 **Garmin Assistant Setup** 中选择 **DeepSeek API**，保存 Garmin 设置并检查连接。
 2. 从 Windows 开始菜单打开 **Garmin Assistant DeepSeek**。macOS、Linux 或手动安装的用户可在已安装环境中运行 `garmin-assistant deepseek`。
 3. 选择 **Flash**（`deepseek-flash`）或 **V4 Pro**（`deepseek-v4-pro`）。阅读数据发送说明，输入 `yes` 后，在终端隐藏输入框填写 DeepSeek API 密钥。也可通过环境变量 `DEEPSEEK_API_KEY` 提供密钥。
-4. 输入编号或自然语言提问。例如输入 **2** 分析明天的训练。输入 `/quit` 退出。
+4. 输入编号或自然语言提问。例如输入 **4** 选择明天的运动项目。输入 `/quit` 退出。
 
 此终端客户端使用 DeepSeek API 的非思考模式调用工具。发送内容包括最近的问答、用到的 Garmin 健康和活动结果（可能含位置），以及你按编号选中的自定义流程。模型用量由 DeepSeek 账户计费。Garmin 与 DeepSeek 使用不同的密钥，请分别填写在本机设置和终端密钥提示中。模型密钥仅供当前会话使用。[DeepSeek API 平台](https://platform.deepseek.com/) · [官方模型及工具支持](https://api-docs.deepseek.com/quick_start/pricing/)
 
@@ -269,8 +269,8 @@ doubao mcp list --json
 
 1. `doctor` 能显示版本、自己的时区和 `key_configured`。
 2. `doctor --live` 返回 `garmin_status: ok` 或明确的无数据状态。
-3. 首次先调用 `garmin_welcome` 选择语言，然后调用 `garmin_function_menu` 看到核心 1–7。
+3. 首次先调用 `garmin_welcome` 选择语言，然后调用 `garmin_function_menu` 看到主菜单 1–4。
 4. 同步后能返回间隔起止与缺失信息。
-5. 添加自定义功能、隐藏 1–7，再输入“显示原有功能菜单”，原菜单恢复且扩展仍在。
+5. 添加自定义功能、隐藏 1–4，再输入“显示原有功能菜单”，原菜单恢复且扩展仍在。
 
 只有实际完成这些步骤的客户端才算端到端验证；文档配置示例不能代替验收。

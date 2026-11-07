@@ -39,7 +39,7 @@ Start menu under my normal user account, or double-click the extracted Install.c
 
 After I finish setup, verify the installed version and ask me to use Save and check Garmin.
 Do not call a saved configuration a verified connection. Tell me to restart the selected AI client,
-say Start Garmin Assistant, then Show original function menu. Verify IDs 1–7 and preserve custom
+say Start Garmin Assistant, then Show function menu. Verify IDs 1–4 and preserve custom
 functions. Do not automatically download health history until I choose to sync.
 Ordinary web/mobile chats and Doubao editions without local stdio MCP cannot connect through a
 Python path; use config export only when supported, otherwise explain the local-report upload route.
@@ -83,7 +83,7 @@ API 密钥。不要索取、读取、打印、上传或提交我的密钥和健�
 请让我用平常登录的 Windows 账户从开始菜单打开 Garmin Assistant Setup；若找不到快捷方式，双击解压后的 Install.cmd。
 
 我完成设置后，检查安装版本，提醒我点击“保存并检查 Garmin”验证实时读取。
-提醒我重启所选 AI 客户端，输入“启动佳明助手”，再输入“显示原有功能菜单”，确认 1–7
+提醒我重启所选 AI 客户端，输入“启动佳明助手”，再输入“显示功能菜单”，确认 1–4
 功能可见并保留自定义功能。在我选择同步之前，不要自动下载健康历史数据。
 普通网页／手机聊天、以及不支持本地 stdio MCP 的豆包版本，不能通过本机 Python 路径接入；
 仅在客户端确实支持时使用配置导出，否则说明本地生成报告后上传的用法。

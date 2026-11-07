@@ -29,6 +29,13 @@ def main():
     commands.add_parser('auth',help='Paste your personal API key in a hidden prompt')
     doctor=commands.add_parser('doctor');doctor.add_argument('--live',action='store_true')
     sync=commands.add_parser('sync');sync.add_argument('--days',type=int,default=93);sync.add_argument('--full',action='store_true')
+    commands.add_parser('progress',help='Report 30-day training and 90-day health trends')
+    recovery=commands.add_parser('recovery',help='Compare personal trends and recovery ratings')
+    recovery.add_argument('--fatigue',type=float);recovery.add_argument('--soreness',type=float)
+    plan=commands.add_parser('plan',help='Plan swimming, cycling or running tomorrow')
+    plan.add_argument('--sport',choices=['swimming','cycling','running'],required=True)
+    plan.add_argument('--goal-km',type=float,required=True);plan.add_argument('--goal-minutes',type=float,required=True)
+    plan.add_argument('--subjective-json')
     tomorrow=commands.add_parser('tomorrow');tomorrow.add_argument('--no-sync',action='store_true');tomorrow.add_argument('--no-research',action='store_true');tomorrow.add_argument('--planned-km',type=float);tomorrow.add_argument('--subjective-json')
     commands.add_parser('research')
     menu=commands.add_parser('menu');menu.add_argument('--original',action='store_true');menu.add_argument('--hide',nargs='*',type=int)
@@ -74,10 +81,10 @@ def main():
                         except ValueError:print('请选择 1（中文）或 2（English）/ Please enter 1 or 2.')
                 else:result['onboarding']=welcome(settings)
         elif args.command=='doctor':
-            from .menu import CORE_FUNCTIONS
+            from .menu import PRIMARY_FUNCTIONS
             result={'version':__version__,'python':sys.version.split()[0],'timezone':settings.timezone,
                     'data_dir':str(settings.data_dir),'key_configured':bool(os.environ.get('GARMIN_PERSONAL_API_KEY')) or settings.key_file.is_file(),
-                    'core_menu_ids':[f.id for f in CORE_FUNCTIONS],'status':'ok'}
+                    'core_menu_ids':[f.id for f in PRIMARY_FUNCTIONS],'status':'ok'}
             if args.live and settings.language is None:
                 result.update({'garmin_status':'not_checked','onboarding':welcome(settings),
                     'next_step_cli':'garmin-assistant language zh / garmin-assistant language en; then rerun doctor --live'})
@@ -105,6 +112,12 @@ def main():
                 return
             from .server import training,DATA,today
             if args.command=='sync':result=training.sync(days=args.days,full=args.full)
+            elif args.command=='progress':result=training.training_status()
+            elif args.command=='recovery':result=training.recovery_status({'fatigue_0_10':args.fatigue,'soreness_0_10':args.soreness})
+            elif args.command=='plan':
+                from .server import PlanCheck
+                subjective=PlanCheck.model_validate_json(args.subjective_json).model_dump(exclude_none=True) if args.subjective_json else None
+                result=training.plan_tomorrow(args.sport,args.goal_km,args.goal_minutes,subjective)
             elif args.command=='research':
                 from .research import update_research
                 result=update_research(DATA,today(),force=True)

@@ -7,6 +7,7 @@ from .readiness import assess
 from .research import REVIEWED, CLASSIC_MODELS, atomic_json, update_research
 from .sync import SyncManager, local_today
 from .menu import core_menu
+from .monitoring import recovery_status, render_monitoring_report, tomorrow_plan, training_status, validate_goal
 from zoneinfo import ZoneInfo
 
 
@@ -27,6 +28,48 @@ class TrainingWorkflow:
 
     def _today(self):
         return datetime.now(ZoneInfo(self.settings.timezone)).date().isoformat() if self.settings else local_today()
+
+    def _monitoring_inputs(self):
+        today = self._today()
+        sync = self.sync()
+        start = (date.fromisoformat(today) - timedelta(days=92)).isoformat()
+        history = self.store.load(start, today)
+        language = (self.settings.language if self.settings else None) or 'zh'
+        return today, {**sync, 'fresh': sync['status'] == 'ok'}, history, language
+
+    def _save_monitoring_report(self, result, sync, language, prefix):
+        from .menu import MenuStore
+
+        result.update({'sync': sync, 'language': language, 'source': 'Garmin Personal API',
+                       'function_menu': MenuStore(self.folder / 'menu-preferences.json').view()['function_menu']})
+        self.report_folder.mkdir(parents=True, exist_ok=True)
+        stem = f"{prefix}_{result.get('target_date', result['as_of'])}"
+        json_path = self.report_folder / f'{stem}.json'
+        markdown_path = json_path.with_suffix('.md')
+        result.update({'report_json': str(json_path), 'report_markdown': str(markdown_path)})
+        if language == 'en':
+            from .onboarding import localize_result
+            result = localize_result(result, language)
+        atomic_json(json_path, result)
+        markdown_path.write_text(render_monitoring_report(result), encoding='utf-8')
+        return result
+
+    def training_status(self):
+        today, sync, history, language = self._monitoring_inputs()
+        return self._save_monitoring_report(training_status(history, today, language), sync, language, 'training_status')
+
+    def recovery_status(self, subjective=None):
+        today, sync, history, language = self._monitoring_inputs()
+        result = recovery_status(history, today, subjective, sync['fresh'], language)
+        result['research'] = update_research(self.folder, today)
+        return self._save_monitoring_report(result, sync, language, 'recovery_status')
+
+    def plan_tomorrow(self, sport, distance_km, minutes, subjective=None):
+        validate_goal(sport, distance_km, minutes)
+        today, sync, history, language = self._monitoring_inputs()
+        result = tomorrow_plan(history, today, sport, distance_km, minutes, subjective, sync['fresh'], language)
+        result['research'] = update_research(self.folder, today)
+        return self._save_monitoring_report(result, sync, language, f'tomorrow_{sport}')
 
     def tomorrow(self, as_of=None, subjective=None, planned_km=None, sync_first=True, research_refresh=True, force_research=False):
         operation_today=self._today()

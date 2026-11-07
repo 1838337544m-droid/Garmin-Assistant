@@ -104,7 +104,7 @@ def discover_pubmed(as_of):
     import requests
     url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
     topics=[
-        '(running[Title/Abstract] OR endurance[Title/Abstract]) AND (training intensity[Title/Abstract] OR training distribution[Title/Abstract])',
+        '(running[Title/Abstract] OR cycling[Title/Abstract] OR swimming[Title/Abstract] OR endurance[Title/Abstract]) AND (training intensity[Title/Abstract] OR training distribution[Title/Abstract])',
         '(athlete[Title/Abstract] OR endurance[Title/Abstract]) AND (heart rate variability[Title/Abstract] OR readiness[Title/Abstract] OR sleep recovery[Title/Abstract])',
         'running[Title/Abstract] AND (return to running[Title/Abstract] OR injury rehabilitation[Title/Abstract] OR bone stress[Title/Abstract])',
     ]
@@ -129,7 +129,7 @@ def discover_pubmed(as_of):
 def discover_europepmc(as_of):
     import requests
     topics=[
-        'TITLE_ABS:("endurance training") AND TITLE_ABS:(polarized OR pyramidal OR "intensity distribution")',
+        'TITLE_ABS:("endurance training" OR swimming OR cycling OR running) AND TITLE_ABS:(polarized OR pyramidal OR "intensity distribution")',
         'TITLE_ABS:(athlete OR endurance) AND TITLE_ABS:("heart rate variability" OR "readiness to train" OR "sleep recovery")',
         'TITLE_ABS:(running) AND TITLE_ABS:("return to running" OR rehabilitation OR "bone stress")',
     ]
@@ -167,7 +167,7 @@ def update_research(folder, as_of, force=False, fetch=None):
     age=(date.fromisoformat(as_of)-date.fromisoformat(checked)).days if checked else 999
     metadata={'reviewed_sources':REVIEWED,'rules_reviewed_on':'2026-10-28',
               'classic_models':CLASSIC_MODELS,'refresh_interval_days':7,
-              'interpretation_policy':'Before using a newly retrieved article, assess its study design, running-specific applicability and limitations; cite title/year/link and distinguish its findings from the implemented heuristics. If no applicable higher-quality evidence changes the classic framework, say so. Do not equate newest with strongest evidence.',
+              'interpretation_policy':'Before using a newly retrieved article, assess its study design, applicability to the selected sport and limitations; cite title/year/link and distinguish findings from the implemented heuristics. Newer evidence may be exploratory.',
               'scope':'Selected PubMed-indexed papers since 2024, retrieved via NCBI or Europe PMC; not an exhaustive systematic search. Retrieved abstracts require appraisal before changing advice.',
               'health_data_shared':False}
     if not force and 0<=age<7:

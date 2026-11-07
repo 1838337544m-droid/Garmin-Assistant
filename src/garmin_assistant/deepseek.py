@@ -10,6 +10,7 @@ import httpx
 
 from .menu import MenuStore, RESTORE_COMMAND
 from .onboarding import choose_language, localize_result, welcome
+from .monitoring import SPORTS, validate_goal
 
 MODELS = ('deepseek-flash', 'deepseek-v4-pro')
 ENDPOINT = 'https://api.deepseek.com/chat/completions'
@@ -17,6 +18,7 @@ TOOLS = frozenset({
     'garmin_status', 'garmin_function_menu', 'garmin_daily_summary', 'garmin_sleep',
     'garmin_heart_rate', 'garmin_hrv', 'garmin_range', 'garmin_activities',
     'garmin_activity_detail', 'garmin_sync_data', 'garmin_assess_tomorrow',
+    'garmin_training_status', 'garmin_recovery_status', 'garmin_plan_tomorrow',
     'garmin_update_research',
 })
 
@@ -27,6 +29,21 @@ async def tool_definitions(mcp):
                                          'parameters': tool.inputSchema}}
         for tool in await mcp.list_tools() if tool.name in TOOLS
     ]
+
+
+def public_tool_data(value):
+    if isinstance(value, list):
+        return [public_tool_data(item) for item in value]
+    if isinstance(value, dict):
+        payload = {}
+        for key, item in value.items():
+            if key in ('report_json', 'report_markdown'):
+                continue
+            if key == 'function_menu' and isinstance(item, list):
+                item = [row for row in item if isinstance(row, dict) and row.get('id') in range(1, 8)]
+            payload[key] = public_tool_data(item)
+        return payload
+    return value
 
 
 async def tool_output(mcp, function):
@@ -46,10 +63,7 @@ async def tool_output(mcp, function):
             result = json.loads(result[0].text)
         if not isinstance(result, dict):
             raise ValueError('Expected a structured Garmin result')
-        payload = {key: value for key, value in result.items() if key not in ('report_json', 'report_markdown')}
-        if 'function_menu' in payload:
-            payload['function_menu'] = [item for item in payload['function_menu'] if item['id'] in range(1, 8)]
-        encoded = json.dumps(payload, ensure_ascii=False)
+        encoded = json.dumps(public_tool_data(result), ensure_ascii=False)
         if len(encoded.encode('utf-8')) > 160_000:
             return '{"error":"Result too large. Request a shorter date range or fewer activities."}'
         return encoded
@@ -90,6 +104,26 @@ def show_menu(store, language, restore=False):
     return menu
 
 
+def ask_training_goal(zh):
+    sports = list(SPORTS)
+    for index, sport in enumerate(sports, 1):
+        print(f'{index}. {SPORTS[sport][not zh]}')
+    choice = input('选择运动项目（回车取消） ' if zh else 'Choose a sport (Enter to cancel) ').strip()
+    if choice not in ('1', '2', '3'):
+        return None
+    sport = sports[int(choice) - 1]
+    unit = 'm' if sport == 'swimming' else 'km'
+    try:
+        distance = float(input(f'目标距离（{unit}） ' if zh else f'Target distance ({unit}) '))
+        minutes = float(input('目标时间（分钟） ' if zh else 'Target time (minutes) '))
+        km = distance / 1000 if sport == 'swimming' else distance
+        validate_goal(sport, km, minutes)
+    except ValueError:
+        print('目标无效，请重新选择 4 后填写。' if zh else 'Invalid goal. Choose 4 again to retry.')
+        return None
+    return f"4. Tomorrow's training plan. Selected sport: {sport}; target: {km:g} km in {minutes:g} minutes. Ask for any missing symptom inputs."
+
+
 async def chat(settings, model, api_key):
     from .server import mcp
 
@@ -116,12 +150,20 @@ async def chat(settings, model, api_key):
             if question.casefold() in (RESTORE_COMMAND, 'show original function menu'):
                 menu = show_menu(store, settings.language, restore=True)
                 continue
+            cancelled = False
             for item in menu:
                 if question == str(item['id']):
                     question = f"{item['id']}. {item['command']}"
+                    if item.get('tool') == 'garmin_plan_tomorrow':
+                        question = ask_training_goal(zh)
+                        cancelled = question is None
+                    elif item.get('tool'):
+                        question += f"\nSelected menu tool: {item['tool']}"
                     if item['id'] >= 100:
                         question += f"\nSelected user workflow:\n{item['description']}"
                     break
+            if cancelled:
+                continue
             user = {'role': 'user', 'content': question}
             messages = [system, *history, user]
             try:

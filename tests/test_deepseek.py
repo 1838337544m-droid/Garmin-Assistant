@@ -5,7 +5,7 @@ import httpx
 import pytest
 
 from garmin_assistant.config import load_settings, save_settings
-from garmin_assistant.deepseek import ask, tool_definitions
+from garmin_assistant.deepseek import ask, tool_definitions, tool_output
 from garmin_assistant.menu import MenuStore
 
 
@@ -29,7 +29,7 @@ def test_deepseek_round_trip_uses_real_mcp_menu_and_blocks_unknown_tools(monkeyp
         else:
             menu, blocked = body['messages'][-2:]
             assert menu['tool_call_id'] == 'menu'
-            assert [item['id'] for item in json.loads(menu['content'])['function_menu']] == list(range(1, 8))
+            assert [item['id'] for item in json.loads(menu['content'])['function_menu']] == list(range(1, 5))
             assert 'unavailable' in blocked['content']
             message = {'content': 'Here is the Garmin menu.'}
         return httpx.Response(200, json={'choices': [{'message': message}]})
@@ -65,3 +65,14 @@ def test_declining_data_transfer_skips_key_prompt_and_connection(monkeypatch):
     monkeypatch.setattr(deepseek.getpass, 'getpass', unexpected)
     monkeypatch.setattr(deepseek, 'chat', unexpected)
     assert deepseek.run(settings, model='deepseek-flash') == 0
+
+
+def test_monitoring_sync_metadata_does_not_send_unselected_custom_workflows():
+    class MonitoringServer:
+        async def call_tool(self, name, arguments):
+            return {'sync': {'fresh': True, 'function_menu': [{'id': 1, 'command': 'Sync'},
+                     {'id': 100, 'command': 'Private', 'description': 'Private workflow details'}]}}
+
+    result = asyncio.run(tool_output(MonitoringServer(), {'name': 'garmin_training_status', 'arguments': '{}'}))
+    assert json.loads(result)['sync']['function_menu'] == [{'id': 1, 'command': 'Sync'}]
+    assert 'Private' not in result

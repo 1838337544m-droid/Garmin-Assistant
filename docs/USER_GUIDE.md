@@ -163,23 +163,21 @@ In these short commands, use the executable in your `.venv` if it is not on PATH
 ### 5. Core function menu
 
 1. Sync data: initial 93-day backfill, then fill intervening dates and revisit a seven-day overlap.
-2. Assess tomorrow's training against the personal goal.
-3. View activities and details.
-4. View sleep, heart rate and HRV.
-5. Read steps, stress and Body Battery over a date range.
-6. Update running and rehabilitation research.
-7. View sync status and the function menu.
+2. Review training and current status over the most recent 30 days, compared with the previous 30. Review 90 completed days of HRV, resting heart rate, sleep, daily SpO₂ and sleep SpO₂ separately.
+3. Review fatigue and recovery using personal trends, self-reported fatigue and soreness from 0–10, and recorded training volume. The report gives sources and missing inputs.
+4. Choose swimming, cycling or running and enter your target distance and time. Provide current symptoms for a provisional plan and recheck the next morning.
 
-After language selection, reply with a function ID in a connected AI. Hidden core IDs are not
-renumbered; custom functions start at 100.
+After language selection, reply with a function ID in a connected AI. Custom functions start at 100.
+**Show original function menu** displays the previous seven commands with their original numbering.
 
 ### 6. Each assessment
 
 The AI should sync first; the next-day assessment tool does so automatically. Long gaps are fetched
 in chunks where Garmin supports the history. Missing data is not zero and does not prove inactivity.
 Research is searched again after seven days since the last successful search; failures are labeled.
-Advice combines recent applicable evidence with classic fitness–fatigue, intensity-distribution and
-Daniels frameworks, with citations. New papers are unappraised candidates, not automatic changes to the rules.
+The recovery report compares the most recent seven completed days with the preceding 83 days of
+personal history. It uses recorded duration and sessions as training volume and lists the scope of
+each indicator. New research candidates require appraisal before they inform advice.
 
 Provide current pain, fatigue, illness and planned distance. Unknown symptoms are not assumed absent.
 Tomorrow's result is provisional until the morning recheck. It is not medical clearance or a guarantee
@@ -191,10 +189,12 @@ Replace `garmin-assistant` below with your `.venv` executable if needed:
 
 ```sh
 garmin-assistant sync
-garmin-assistant tomorrow
+garmin-assistant progress
+garmin-assistant recovery --fatigue 3 --soreness 2
+garmin-assistant plan --sport swimming --goal-km 1 --goal-minutes 30
 garmin-assistant research
 garmin-assistant menu
-garmin-assistant menu --hide 1 2 3 4 5 6 7
+garmin-assistant menu --hide 1 2 3 4
 garmin-assistant menu --original
 ```
 
@@ -409,23 +409,20 @@ MCP 连接本身不保证客户端立刻弹消息：可以在连接后说“开�
 ## 4. 功能菜单
 
 1. 同步数据：首次回填 93 天，之后补齐间隔并重查 7 天重叠区间。
-2. 分析明天是否适合运动：先同步，再结合个人恢复与跑步目标。
-3. 查看运动记录与详情。
-4. 查看睡眠、心率和 HRV。
-5. 查看区间步数、压力和 Body Battery。
-6. 更新长跑训练和康复文献。
-7. 查看同步状态或功能菜单。
+2. 截至目前训练效果与状态。比较近 30 天与前一个 30 天的运动频次和主要数据，单列近 90 个完整日的 HRV、静息心率、睡眠、日均和睡眠血氧。
+3. 疲劳与恢复。结合个人趋势、自评疲劳与酸痛（0–10）和近期记录训练量，给出出处和缺测项。
+4. 明天运动建议。先选择游泳、自行车或跑步，再填写目标距离与时间，补充当前症状后获取建议，次日早晨复评。
 
 在连接成功的 AI 中可直接回复编号；数字按菜单原编号解析。
-隐藏后剩余编号不会重新从 1 排号，自定义编号从 100 起。
+隐藏后剩余编号不会重新从 1 排号，自定义编号从 100 起。输入 **显示原有功能菜单** 可查看原来的七项及原编号。
 
 ## 5. 每次分析
 
 AI 应先补齐数据；默认明日分析自动执行同步。间隔很长时分段尝试回填，
 Garmin 未提供的记录标为缺失，不能当作没运动或数值为零。
 资料距上次成功检索满 7 天时重新检索长跑、恢复与康复论文；失败注明旧资料。
-结合经典适能—疲劳框架、强度分配与 Daniels 分类并提供出处。
-新论文是待评估候选，不代表程序自动验证或更新了训练规则。
+恢复报告将近 7 个完整日与此前 83 天的个人基线比较，训练量以记录次数和时长呈现。
+血氧单列，使用现有记录计算，缺测会标明。新论文需要评估后再用于建议。
 
 主动补充疼痛、疲劳、疾病和明日计划距离。未提供的症状是未知。
 明天的建议属于预建议，明早同步睡眠后复评；不保证最快达标时间，
@@ -437,10 +434,12 @@ Garmin 未提供的记录标为缺失，不能当作没运动或数值为零。
 
 ```sh
 garmin-assistant sync
-garmin-assistant tomorrow
+garmin-assistant progress
+garmin-assistant recovery --fatigue 3 --soreness 2
+garmin-assistant plan --sport swimming --goal-km 1 --goal-minutes 30
 garmin-assistant research
 garmin-assistant menu
-garmin-assistant menu --hide 1 2 3 4 5 6 7
+garmin-assistant menu --hide 1 2 3 4
 garmin-assistant menu --original
 ```
 

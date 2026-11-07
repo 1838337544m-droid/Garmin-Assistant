@@ -25,11 +25,17 @@ class CoreFunction:
 
 
 CORE_FUNCTIONS=tuple(CoreFunction(i,**row) for i,row in enumerate(_CORE_RAW,1))
+PRIMARY_FUNCTIONS=(
+    CORE_FUNCTIONS[0],
+    CoreFunction(2,'截至目前训练效果与状态','查看近 30 天常做项目、频次和训练数据，以及近 90 天的身体指标。','garmin_training_status'),
+    CoreFunction(3,'疲劳与恢复','结合个人指标趋势、主观疲劳和酸痛，以及近期训练量。','garmin_recovery_status'),
+    CoreFunction(4,'明天运动建议','选择游泳、自行车或跑步，再提供目标距离和时间。','garmin_plan_tomorrow'),
+)
 RESTORE_COMMAND='显示原有功能菜单'
 
 
 def core_menu():
-    return [asdict(item) for item in CORE_FUNCTIONS]
+    return [asdict(item) for item in PRIMARY_FUNCTIONS]
 
 
 FUNCTION_MENU=core_menu()
@@ -62,15 +68,19 @@ class MenuStore:
     def __init__(self,path):self.path=path
 
     def _load(self):
-        if not self.path.exists():return {'schema_version':1,'hidden_core_ids':[],'custom':[],'next_custom_id':100}
+        if not self.path.exists():return {'schema_version':2,'hidden_core_ids':[],'custom':[],'next_custom_id':100}
         raw=json.loads(self.path.read_text(encoding='utf-8'))
-        if raw.get('schema_version')!=1:raise ValueError('Unsupported menu schema')
+        if raw.get('schema_version')==1:
+            old_to_new={1:1,2:4}
+            raw['hidden_core_ids']=[old_to_new[i] for i in raw['hidden_core_ids'] if i in old_to_new]
+            raw['schema_version']=2
+        if raw.get('schema_version')!=2:raise ValueError('Unsupported menu schema')
         return raw
 
     def view(self):
         state=self._load()
         return {'function_menu':[x for x in core_menu() if x['id'] not in state['hidden_core_ids']]+state['custom'],
-                'restore_command':RESTORE_COMMAND,'core_ids':list(range(1,8)),
+                'restore_command':RESTORE_COMMAND,'core_ids':[item.id for item in PRIMARY_FUNCTIONS],
                 'note':'隐藏仅影响菜单显示；原有核心工具仍可调用。自定义项目是提示词工作流，不执行代码。'}
 
     @menu_transaction
@@ -82,14 +92,16 @@ class MenuStore:
     @menu_transaction
     def restore(self):
         state=self._load();state['hidden_core_ids']=[];atomic_json(self.path,state)
-        return {'function_menu':core_menu(),'restore_command':RESTORE_COMMAND,'custom_preserved':len(state['custom'])}
+        return {'function_menu':[asdict(item) for item in CORE_FUNCTIONS],'menu_variant':'legacy',
+                'restore_command':RESTORE_COMMAND,'custom_preserved':len(state['custom'])}
 
     @menu_transaction
     def add(self,name,instructions):
         name=name.strip();instructions=instructions.strip()
-        from .onboarding import MENU_EN
-        reserved={RESTORE_COMMAND,'Show original function menu'}|{x.command for x in CORE_FUNCTIONS}|{t.strip() for x in CORE_FUNCTIONS for t in x.tool.split('/')}
-        reserved.update(value[0] for value in MENU_EN.values())
+        from .onboarding import MENU_EN, LEGACY_MENU_EN
+        functions=CORE_FUNCTIONS+PRIMARY_FUNCTIONS
+        reserved={RESTORE_COMMAND,'Show original function menu'}|{x.command for x in functions}|{t.strip() for x in functions for t in x.tool.split('/')}
+        reserved.update(value[0] for value in (*MENU_EN.values(),*LEGACY_MENU_EN.values()))
         if not name or len(name)>60 or name.casefold() in {s.casefold() for s in reserved} or name.casefold().startswith('garmin_'):
             raise ValueError('Name empty, too long or reserved by the core')
         if not instructions or len(instructions)>4000:raise ValueError('Instructions must contain 1–4000 characters')

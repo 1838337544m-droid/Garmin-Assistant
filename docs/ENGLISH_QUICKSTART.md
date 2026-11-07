@@ -68,16 +68,12 @@ an unsolicited chat popup just because a server was connected.
 ## Core functions
 
 1. Sync data and fill the interval since the last successful sync.
-2. Assess tomorrow's training against your personal goal.
-3. View activities and activity details.
-4. View sleep, heart rate and HRV.
-5. Read steps, stress and Body Battery over a date range.
-6. Refresh running and rehabilitation research.
-7. View sync status and the function menu.
+2. Review 30 days of training and 90 days of health data.
+3. Assess fatigue and recovery with personal trends and self-reported fatigue and soreness.
+4. Plan tomorrow's swim, ride or run using your target distance and time.
 
-Core IDs remain 1–7. Custom prompt workflows use IDs >=100 and cannot replace core
-tools. Hidden core items can be restored with **Show original function menu** or
-**显示原有功能菜单**; your custom items are retained.
+The primary menu has IDs 1–4. **Show original function menu** or **显示原有功能菜单** displays
+the previous seven commands. Custom prompt workflows retain IDs from 100 upward.
 
 Switch at any time with `garmin-assistant language en` or `garmin-assistant language zh`.
 Raw Garmin fields, paper titles and user-authored custom text are not rewritten.
@@ -133,14 +129,11 @@ macOS/Linux 使用 `python3` 和 `.venv/bin/garmin-assistant`。
 首次交互会问语言，选好后使用菜单编号：
 
 1. 同步数据。
-2. 分析明天是否适合运动。
-3. 查看运动记录与详情。
-4. 查看睡眠、心率和 HRV。
-5. 查看区间步数、压力和 Body Battery。
-6. 更新训练和康复文献。
-7. 查看状态与功能菜单。
+2. 查看近 30 天训练和近 90 天身体状态。
+3. 结合个人趋势和自评疲劳、酸痛评估恢复。
+4. 选择游泳、自行车或跑步，再填写距离和时间，获取明日建议。
 
-核心可隐藏，输入 **显示原有功能菜单** 恢复；自定义编号从 100 起并保留。
+输入 **显示原有功能菜单** 可查看原七项功能。自定义编号仍从 100 起。
 切换语言可用 `language zh` 或 `language en`。原始数据、论文标题和用户工作流不改写。
 建议需明早复评，不作医疗放行、受伤概率或最快达标保证。新论文需评估，
 不会自动改写规则。所连接的 AI 会接收使用中的工具结果。

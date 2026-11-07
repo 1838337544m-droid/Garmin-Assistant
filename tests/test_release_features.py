@@ -8,14 +8,14 @@ def test_hidden_core_is_restored_and_custom_functions_survive():
     with tempfile.TemporaryDirectory() as tmp:
         store=MenuStore(Path(tmp)/'preferences.json')
         initial=store.view()['function_menu']
-        assert [x['id'] for x in initial]==list(range(1,8))
+        assert [x['id'] for x in initial]==list(range(1,5))
         extension=store.add('我的周总结','查询最近七天记录，再总结跑量变化。')
         assert extension['id']>=100
         store.hide(list(range(1,8)))
         assert [x['id'] for x in MenuStore(store.path).view()['function_menu']]==[extension['id']]
         restored=MenuStore(store.path).restore()
         assert [x['id'] for x in restored['function_menu']]==list(range(1,8))
-        assert len(MenuStore(store.path).view()['function_menu'])==8
+        assert len(MenuStore(store.path).view()['function_menu'])==5
 
 
 @pytest.mark.parametrize('name',['同步数据','显示原有功能菜单','garmin_sync_data'])

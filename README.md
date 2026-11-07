@@ -77,15 +77,12 @@ and diagnostic commands together while the program is asking for the key.
 | ID | Core function |
 |---|---|
 | 1 | Sync data and fill the interval since the previous successful sync |
-| 2 | Assess tomorrow's training |
-| 3 | View activities and activity details |
-| 4 | View sleep, heart rate and HRV |
-| 5 | Read steps, stress and Body Battery over a date range |
-| 6 | Refresh running and rehabilitation research |
-| 7 | View sync status and the function menu |
+| 2 | Review 30-day training frequency and performance trends, plus 90-day HRV, resting heart rate, sleep and SpO₂ |
+| 3 | Review fatigue and recovery using personal trends, reported fatigue and soreness, and recent training volume |
+| 4 | Plan tomorrow's swimming, cycling or running around your selected target distance and time |
 
-Core IDs 1–7 are stable. Hide them without removing the tools; say **Show original function menu**
-or **显示原有功能菜单** to restore them. Custom prompt workflows retain IDs starting at **100**.
+Say **Show original function menu** or **显示原有功能菜单** to display the previous seven commands.
+Custom prompt workflows retain IDs starting at **100**.
 They cannot override core tools and do not execute arbitrary third-party code.
 
 ### AI client compatibility
@@ -215,15 +212,11 @@ macOS/Linux 对应命令与说明见[用户手册](docs/USER_GUIDE.md)。
 | 编号 | 核心功能 |
 |---|---|
 | 1 | 同步数据、补齐询问间隔 |
-| 2 | 分析明天是否适合运动 |
-| 3 | 查看运动记录与详情 |
-| 4 | 查看睡眠、心率和 HRV |
-| 5 | 区间步数、压力和 Body Battery |
-| 6 | 更新长跑训练和康复文献 |
-| 7 | 同步状态与功能菜单 |
+| 2 | 截至目前训练效果与状态。近 30 天运动频次和主要数据，近 90 天 HRV、静息心率、睡眠和血氧 |
+| 3 | 疲劳与恢复。结合个人趋势、主观疲劳和酸痛、近期训练量，附研究出处 |
+| 4 | 明天运动建议。选择游泳、自行车或跑步，再填写目标距离与时间 |
 
-核心编号固定，可以隐藏，不能被自定义工作流覆盖。随时输入
-**显示原有功能菜单** 恢复 1–7；自定义功能仍保留。
+输入 **显示原有功能菜单** 可调出原来的七项功能。自定义功能仍保留。
 自定义工作流从 **100** 起编号，不自动执行第三方代码。
 
 ## 平台接入
