@@ -34,7 +34,7 @@ existing private credential files. Do not start public tunnels. The setup wizard
 backs up client config and requires confirmation before replacing an existing Garmin entry.
 If launching the GUI would block your command tool, start it as an explicitly interactive app.
 
-After I finish setup, verify the installed version and ask me to use Check Garmin connection.
+After I finish setup, verify the installed version and ask me to use Save and check Garmin.
 Do not call a saved configuration a verified connection. Tell me to restart the selected AI client,
 say Start Garmin Assistant, then Show original function menu. Verify IDs 1–7 and preserve custom
 functions. Do not automatically download health history until I choose to sync.
@@ -77,7 +77,7 @@ API 密钥。不要索取、读取、打印、上传或提交我的密钥和健�
 不创建公网隧道。设置窗口会保留并备份客户端配置，替换已有佳明条目前需要我的明确选择。
 如果图形窗口会阻塞你的命令工具，请按用户交互应用方式启动。
 
-我完成设置后，检查安装版本，提醒我点击“检查 Garmin 连接”。配置保存不等于连接验证通过。
+我完成设置后，检查安装版本，提醒我点击“保存并检查 Garmin”验证实时读取。
 提醒我重启所选 AI 客户端，输入“启动佳明助手”，再输入“显示原有功能菜单”，确认 1–7
 功能可见并保留自定义功能。在我选择同步之前，不要自动下载健康历史数据。
 普通网页／手机聊天、以及不支持本地 stdio MCP 的豆包版本，不能通过本机 Python 路径接入；

@@ -3,6 +3,11 @@
 
 ## English version
 
+### 0.1.6 — Setup diagnostics
+
+- Saving the same client connection twice succeeds. Switching an existing connection to a different installation still asks for explicit replacement and creates a backup.
+- **Save and check Garmin** verifies the credentials independently of AI client registration. Setup reports which step failed and keeps the key field available for correction if settings could not be saved.
+
 ### 0.1.5 — DeepSeek chat
 
 - Added local chat with DeepSeek Flash and V4 Pro using the existing Garmin tools.
@@ -48,6 +53,11 @@
 ---
 
 ## 中文版本
+
+### 0.1.6 — 安装自检
+
+- 重复保存同一客户端连接可以正常完成。切换到另一个安装时，仍需明确勾选替换，并先备份原配置。
+- **保存并检查 Garmin** 可独立验证凭据。设置窗口分别报告本机设置、实时读取和客户端注册结果，保存失败时保留密钥输入以便修正。
 
 ### 0.1.5 — DeepSeek 聊天
 

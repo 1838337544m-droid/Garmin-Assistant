@@ -34,6 +34,16 @@ def test_existing_garmin_requires_replacement_confirmation(tmp_path):
     assert json.loads(path.read_text())['mcpServers']['garmin-assistant']['command']==sys.executable
 
 
+def test_resaving_identical_claude_entry_is_a_noop(tmp_path):
+    path = tmp_path / 'client.json'
+    settings = load_settings()
+    connect_claude(path, settings)
+    original = path.read_bytes()
+    assert connect_claude(path, settings) is None
+    assert path.read_bytes() == original
+    assert not list(tmp_path.glob('*.bak'))
+
+
 @pytest.mark.parametrize('raw',['{broken','[]','{"mcpServers":[]}'])
 def test_invalid_client_file_is_never_replaced(tmp_path,raw):
     path=tmp_path/'client.json';path.write_text(raw,encoding='utf-8')

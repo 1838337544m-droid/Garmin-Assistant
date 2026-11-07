@@ -31,7 +31,7 @@ the instructions; it must follow its own permission prompts.
 8. Enter your IANA timezone, e.g. `America/New_York`, `Europe/London`, `Asia/Dubai`, or `Asia/Shanghai`.
    Default UTC is displayed, not a detected local timezone. Set your own running goal.
 9. Select the client below and click **Save and connect**. Settings and the key are stored locally.
-10. Click **Check Garmin connection**. Saving settings alone does not verify a Garmin read.
+10. Click **Save and check Garmin** to verify the API key and live read independently of the AI client.
 11. Restart the AI client. Say **Start Garmin Assistant**, then **Show original function menu**.
     Choose **1** to sync data or **2** for tomorrow's exercise assessment.
 
@@ -51,7 +51,7 @@ Do not disable security controls; use your administrator's approved process or t
 
 For Claude, use the config file opened by the client's **Edit Config** command. The displayed path
 is a common default; Microsoft Store editions can differ. Use **Browse** to select the correct file.
-Existing Garmin entries require the **Replace** checkbox. The original config is kept beside the
+Switching an existing Garmin entry to a different installation requires the **Replace** checkbox. Repeated saves of the same entry succeed. The original config is kept beside the
 file as a uniquely named `.bak`; this can contain other client settings, so keep it private.
 
 An MCP entry is not proof that the client has loaded the tools. After restart, confirm the welcome
@@ -122,7 +122,7 @@ AI 按说明安装本地程序并打开设置窗口，你只在这个窗口填�
 8. 填写 IANA 时区，例如中国 `Asia/Shanghai`、迪拜 `Asia/Dubai`、纽约 `America/New_York`。
    显示的默认 UTC 不是自动识别结果，请自行设置，并确认跑步目标。
 9. 选择下面说明的客户端，点击“**保存并接入**”，配置和密钥会保存在本机。
-10. 点击“**检查 Garmin 连接**”。保存成功本身不代表已经成功获取 Garmin 数据。
+10. 点击“**保存并检查 Garmin**”，独立于 AI 客户端验证密钥并实时读取数据。
 11. 重启 AI 客户端，输入“**启动佳明助手**”，然后输入“**显示原有功能菜单**”。
     选择 **1** 同步数据，选择 **2** 分析明天是否适合运动。
 
@@ -140,7 +140,7 @@ Windows 或组织策略可能阻止下载脚本；请遵循管理员认可的方
 | Export only / 仅导出（豆包等） | 在个人数据目录导出不含密钥值的 `client-config.json`；仅供支持本地 stdio MCP 的客户端导入，不会自动连接豆包。 |
 
 Claude 配置路径以客户端“**编辑配置 / Edit Config**”打开的文件为准。窗口显示的是常见默认路径，微软商店版可能不同，可点击“浏览”选择正确文件。
-已有佳明条目时，需勾选“**替换已有佳明连接条目**”。原文件保存在旁边唯一命名的 `.bak` 备份中，可能包含其他客户端设置，请妥善保管。
+已有佳明条目指向另一个安装时，需勾选“**替换已有佳明连接条目**”。同一条目可重复保存。替换时原文件保存在旁边唯一命名的 `.bak` 备份中，可能包含其他客户端设置，请妥善保管。
 
 配置写入后仍需重启客户端，确认欢迎信息和编号 1–7 的工具确实出现。套餐和管理员策略可能限制扩展。
 客户端接入方式参考 [Claude 官方说明](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop)
