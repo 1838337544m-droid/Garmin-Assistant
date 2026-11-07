@@ -46,7 +46,7 @@ entry without overwriting other servers. Windows commonly uses
 **Edit Config** command is authoritative; Store editions may use different paths.
 
 Restart the client and say **Start Garmin Assistant**. Choose 1 (Chinese) or 2 (English) at first use,
-then say **Show original function menu**. Configuration shape:
+then say **Show function menu** to use the four main actions. Configuration shape:
 
 ```json
 {
@@ -183,7 +183,7 @@ macOS 通常为 `~/Library/Application Support/Claude/claude_desktop_config.json
 以客户端“编辑配置”打开的实际文件为准，商店版目录可能不同。
 退出并重新打开客户端，检查服务状态，再说“开始使用佳明助手”。
 首次会显示中英双语欢迎语，请先回复 `1`（中文）或 `2`（English），
-选好语言后再说“显示原有功能菜单 / Show original function menu”。
+选好语言后再说“显示功能菜单”，即可使用新的四项主功能。
 
 示例结构（把 Python 路径换成 `client-config` 输出）：
 
