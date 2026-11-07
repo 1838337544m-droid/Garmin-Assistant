@@ -9,6 +9,10 @@ Copy the [English installation prompt](INSTALL_WITH_AI.md#english-version) into 
 can run commands on **your own computer**. It installs the local app and opens a local setup window.
 Enter your key only in that window. Do not paste it into chat.
 
+If the AI runs in a sandbox that restricts writes, ask it to finish the installation and hand off setup.
+Open **Garmin Assistant Setup** from the Windows Start menu under your normal user account and save
+the settings there. If the shortcut is missing, double-click the extracted **Install.cmd**.
+
 If the AI cannot run commands on your computer, choose Option 2. Sending a link to an ordinary
 web/mobile chat does not install software. Local Codex or another authorized local agent can follow
 the instructions; it must follow its own permission prompts.
@@ -98,6 +102,9 @@ user-supplied Garmin account has been tested end to end.
 ## 中文版本
 
 ### 入口一：交给 AI 安装
+
+如果 AI 的沙箱限制写入，让 AI 完成安装后把设置交给你。请用平常登录的 Windows 账户，
+从开始菜单打开 **Garmin Assistant Setup** 并保存设置。如果找不到快捷方式，双击解压后的 **Install.cmd**。
 
 将[中文安装指令](INSTALL_WITH_AI.md#中文版本)复制给**能操作你这台电脑**的 AI 应用。
 AI 按说明安装本地程序并打开设置窗口，你只在这个窗口填写密钥，**不要发到聊天里**。

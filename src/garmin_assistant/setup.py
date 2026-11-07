@@ -11,6 +11,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from .config import save_api_key, save_settings, validate
+from .setup_access import SetupFileError, setup_file_access
 
 
 class SetupIssue(ValueError):
@@ -45,7 +46,8 @@ def connect_claude(path,settings,replace=False):
         raise SetupIssue('missing_config_path')
     path=Path(path).expanduser()
     try:
-        raw=json.loads(path.read_text(encoding='utf-8-sig')) if path.exists() else {}
+        with setup_file_access('client_read', path):
+            raw=json.loads(path.read_text(encoding='utf-8-sig')) if path.exists() else {}
     except (ValueError, UnicodeError):
         raise SetupIssue('invalid_client_config') from None
     if not isinstance(raw,dict) or not isinstance(raw.get('mcpServers',{}),dict):
@@ -56,20 +58,21 @@ def connect_claude(path,settings,replace=False):
         return None
     if 'garmin-assistant' in servers and not replace:
         raise SetupIssue('existing_entry')
-    mode=stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o600
-    backup=backup_file(path)
-    servers['garmin-assistant']=entry
-    path.parent.mkdir(parents=True,exist_ok=True)
-    path=path.parent.resolve()/path.name
-    fd,tmp_name=tempfile.mkstemp(prefix=path.name+'.',suffix='.tmp',dir=path.parent)
-    tmp=Path(tmp_name)
-    try:
-        with os.fdopen(fd,'w',encoding='utf-8') as stream:
-            # mkstemp starts private; preserve the original config's access mode.
-            os.chmod(tmp,mode)
-            json.dump(raw,stream,ensure_ascii=False,indent=2)
-        tmp.replace(path)
-    finally:tmp.unlink(missing_ok=True)
+    with setup_file_access('client', path):
+        mode=stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o600
+        backup=backup_file(path)
+        servers['garmin-assistant']=entry
+        path.parent.mkdir(parents=True,exist_ok=True)
+        path=path.parent.resolve()/path.name
+        fd,tmp_name=tempfile.mkstemp(prefix=path.name+'.',suffix='.tmp',dir=path.parent)
+        tmp=Path(tmp_name)
+        try:
+            with os.fdopen(fd,'w',encoding='utf-8') as stream:
+                # mkstemp starts private; preserve the original config's access mode.
+                os.chmod(tmp,mode)
+                json.dump(raw,stream,ensure_ascii=False,indent=2)
+            tmp.replace(path)
+        finally:tmp.unlink(missing_ok=True)
     return backup
 
 
@@ -78,7 +81,8 @@ def connect_codex(settings,replace=False):
     if not executable:raise SetupIssue('missing_codex')
     path=Path(os.environ.get('CODEX_HOME',str(Path.home()/'.codex')))/'config.toml'
     try:
-        raw=tomllib.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+        with setup_file_access('client_read', path):
+            raw=tomllib.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     except (ValueError, UnicodeError):
         raise SetupIssue('invalid_client_config') from None
     servers = raw.get('mcp_servers', {})
@@ -89,13 +93,18 @@ def connect_codex(settings,replace=False):
         return None
     if 'garmin-assistant' in servers and not replace:
         raise SetupIssue('existing_entry')
-    path.parent.mkdir(parents=True,exist_ok=True)
-    backup=backup_file(path)
+    with setup_file_access('client', path):
+        path.parent.mkdir(parents=True,exist_ok=True)
+        backup=backup_file(path)
     argv=[executable,'mcp','add','garmin-assistant']
     for name,value in entry['env'].items():argv+=['--env',f'{name}={value}']
     argv+=['--',entry['command'],*entry['args']]
     completed=subprocess.run(argv,capture_output=True,timeout=60)
-    if completed.returncode:raise SetupIssue('codex_registration_failed')
+    if completed.returncode:
+        stderr = (completed.stderr or b'').lower()
+        if any(marker in stderr for marker in (b'permission denied', b'access is denied', b'(os error 5)', b'(os error 13)')):
+            raise SetupFileError('client', path, PermissionError())
+        raise SetupIssue('codex_registration_failed')
     return backup
 
 
@@ -110,8 +119,11 @@ def configure(settings,language,timezone,distance,minutes,key):
     if key and any(c.isspace() for c in key):raise SetupIssue('invalid_key_format')
     if not key and not settings.key_file.is_file() and not os.environ.get('GARMIN_PERSONAL_API_KEY'):
         raise SetupIssue('missing_key')
-    if key:save_api_key(settings,key)
-    return save_settings(settings,**changes)
+    if key:
+        with setup_file_access('data', settings.key_file):
+            save_api_key(settings,key)
+    with setup_file_access('data', settings.data_dir/'settings.json'):
+        return save_settings(settings,**changes)
 
 
 def default_claude_path():

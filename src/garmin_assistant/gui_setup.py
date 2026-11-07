@@ -2,6 +2,7 @@
 import json
 import queue
 import subprocess
+import sys
 import threading
 import tkinter as tk
 import webbrowser
@@ -13,6 +14,7 @@ from .menu import MenuStore
 from .onboarding import localize_result
 from .research import atomic_json
 from .setup import SetupIssue, client_entry, configure, connect_claude, connect_codex, console_python, default_claude_path
+from .setup_access import SetupFileError, setup_file_access, write_failure_message
 
 
 SETUP_MESSAGES = {
@@ -97,6 +99,8 @@ class SetupWindow:
                 detail=self.text(*SETUP_MESSAGES[exc.args[0]])
             except subprocess.TimeoutExpired:
                 detail=self.text('The connection or client check timed out. Try again.','连接或客户端检查超时，请重试。')
+            except SetupFileError as exc:
+                detail=write_failure_message(exc,self.language,sys.platform=='win32')
             except OSError:
                 detail=self.text('A local file or program could not be accessed. Check permissions and close the client if it is using the configuration file.','无法访问本机文件或程序。请检查权限；若配置文件正被客户端占用，请先退出客户端。')
             except Exception:
@@ -126,7 +130,9 @@ class SetupWindow:
                 return self.text('Garmin settings saved. Check the Garmin connection, then open Garmin Assistant DeepSeek from the Windows Start menu, or run garmin-assistant deepseek in your installed environment.',
                                  '佳明设置已保存。检查 Garmin 连接后，从 Windows 开始菜单打开 Garmin Assistant DeepSeek，或在已安装环境中运行 garmin-assistant deepseek。')
             else:
-                target=settings.data_dir/'client-config.json';atomic_json(target,{'mcpServers':{'garmin-assistant':client_entry(settings)}})
+                target=settings.data_dir/'client-config.json'
+                with setup_file_access('export', target):
+                    atomic_json(target,{'mcpServers':{'garmin-assistant':client_entry(settings)}})
                 return self.text('Settings saved. Configuration exported to: ','设置已保存。配置导出至：')+str(target)+'\n'+self.text('Import only if your client supports local stdio MCP. This does not connect ordinary web/mobile chats.','仅适用于支持本地 stdio MCP 的客户端，普通网页／手机聊天不能直接连接。')
             menu=localize_result(MenuStore(settings.data_dir/'menu-preferences.json').view(),self.language)
             return self.text('Garmin settings saved and client configured. Use Save and check Garmin to verify the connection, then restart the AI client.','Garmin 设置已保存，客户端已配置。请点“保存并检查 Garmin”验证连接，再重启 AI 客户端。')+'\n'+(self.text('Backup: ','备份：')+str(backup)+'\n' if backup else '')+json.dumps(menu,ensure_ascii=False,indent=2)

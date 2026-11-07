@@ -3,6 +3,11 @@
 
 ## English version
 
+### 0.1.7 — Setup access diagnostics
+
+- Setup identifies the affected data or client configuration file and distinguishes access denial from a file in use. On Windows, it reports the process integrity level when available and explains how to reopen setup under the normal user account.
+- The bilingual AI installation instructions explain how to hand off setup when the AI cannot write to user files. [Issue #1](https://github.com/1838337544m-droid/Garmin-Assistant/issues/1)
+
 ### 0.1.6 — Setup diagnostics
 
 - Saving the same client connection twice succeeds. Switching an existing connection to a different installation still asks for explicit replacement and creates a backup.
@@ -53,6 +58,11 @@
 ---
 
 ## 中文版本
+
+### 0.1.7 — 设置权限诊断
+
+- 设置窗口指出受影响的数据或客户端配置文件，区分权限不足与文件占用。Windows 可读取时显示进程完整性级别，并说明如何用平常登录的账户重新打开设置。
+- 中英文 AI 安装说明补充了受限环境下由用户自行完成设置的步骤。[Issue #1](https://github.com/1838337544m-droid/Garmin-Assistant/issues/1)
 
 ### 0.1.6 — 安装自检
 

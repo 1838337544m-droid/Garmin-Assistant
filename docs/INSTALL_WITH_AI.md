@@ -33,6 +33,9 @@ local setup window. Never request, read, echo, transmit or commit my key/health 
 existing private credential files. Do not start public tunnels. The setup wizard preserves and
 backs up client config and requires confirmation before replacing an existing Garmin entry.
 If launching the GUI would block your command tool, start it as an explicitly interactive app.
+If your Windows execution environment restricts writes to my user data or client configuration,
+finish installation and hand off setup. Ask me to open Garmin Assistant Setup from the Windows
+Start menu under my normal user account, or double-click the extracted Install.cmd if the shortcut is missing.
 
 After I finish setup, verify the installed version and ask me to use Save and check Garmin.
 Do not call a saved configuration a verified connection. Tell me to restart the selected AI client,
@@ -76,6 +79,8 @@ macOS/Linux：使用独立的个人应用目录和 Python 3.12/3.13。下载同�
 API 密钥。不要索取、读取、打印、上传或提交我的密钥和健康数据，不读取原有私密凭据文件，
 不创建公网隧道。设置窗口会保留并备份客户端配置，替换已有佳明条目前需要我的明确选择。
 如果图形窗口会阻塞你的命令工具，请按用户交互应用方式启动。
+如果你的 Windows 执行环境限制写入我的用户数据或客户端配置，请完成安装后把设置交给我。
+请让我用平常登录的 Windows 账户从开始菜单打开 Garmin Assistant Setup；若找不到快捷方式，双击解压后的 Install.cmd。
 
 我完成设置后，检查安装版本，提醒我点击“保存并检查 Garmin”验证实时读取。
 提醒我重启所选 AI 客户端，输入“启动佳明助手”，再输入“显示原有功能菜单”，确认 1–7
