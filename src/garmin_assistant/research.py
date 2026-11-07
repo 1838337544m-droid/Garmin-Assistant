@@ -42,6 +42,24 @@ CLASSIC_MODELS = [
 ]
 
 
+def replace_local_file(staged, destination):
+    try:
+        staged.replace(destination)
+    except OSError as error:
+        if getattr(error, 'winerror', None) != 17:
+            raise
+        # Store Python may redirect files to a different volume even when the
+        # parent directory resolves to its logical path. Resolve the actual files.
+        physical_source = staged.resolve(strict=True)
+        try:
+            physical_target = destination.resolve(strict=True)
+        except FileNotFoundError:
+            physical_target = physical_source.with_name(destination.name)
+        if physical_target != physical_source.with_name(destination.name):
+            raise
+        physical_source.replace(physical_target)
+
+
 def atomic_json(path, payload):
     path.parent.mkdir(parents=True, exist_ok=True)
     # Store Python may virtualize LOCALAPPDATA onto another drive. Resolve the
@@ -50,7 +68,7 @@ def atomic_json(path, payload):
     tmp = path.with_name(path.name+'.'+uuid.uuid4().hex+'.tmp')
     try:
         tmp.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
-        tmp.replace(path)
+        replace_local_file(tmp, path)
     finally:
         tmp.unlink(missing_ok=True)
 

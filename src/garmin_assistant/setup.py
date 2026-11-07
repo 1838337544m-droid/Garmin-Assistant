@@ -11,6 +11,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from .config import save_api_key, save_settings, validate
+from .research import replace_local_file
 from .setup_access import SetupFileError, setup_file_access
 
 
@@ -71,7 +72,7 @@ def connect_claude(path,settings,replace=False):
                 # mkstemp starts private; preserve the original config's access mode.
                 os.chmod(tmp,mode)
                 json.dump(raw,stream,ensure_ascii=False,indent=2)
-            tmp.replace(path)
+            replace_local_file(tmp, path)
         finally:tmp.unlink(missing_ok=True)
     return backup
 

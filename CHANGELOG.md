@@ -3,6 +3,10 @@
 
 ## English version
 
+### 0.1.8 — Windows redirected settings files
+
+- Retry atomic settings and Claude configuration saves using resolved file paths when Windows Store Python reports a cross-volume rename for redirected files.
+
 ### 0.1.7 — Setup access diagnostics
 
 - Setup identifies the affected data or client configuration file and distinguishes access denial from a file in use. On Windows, it reports the process integrity level when available and explains how to reopen setup under the normal user account.
@@ -58,6 +62,10 @@
 ---
 
 ## 中文版本
+
+### 0.1.8 — Windows 重定向设置文件
+
+- Windows 商店版 Python 报告跨卷重命名时，改用文件实际所在路径重试原子保存，修复本机设置和 Claude 配置的保存问题。
 
 ### 0.1.7 — 设置权限诊断
 

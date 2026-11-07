@@ -10,6 +10,7 @@ import pytest
 from garmin_assistant.config import load_settings
 from garmin_assistant.setup import client_entry, connect_claude, connect_codex, configure
 from garmin_assistant.setup_access import SetupFileError, write_failure_message
+from garmin_assistant.research import replace_local_file
 
 
 def test_claude_preserves_servers_backs_up_and_has_no_key(tmp_path):
@@ -43,6 +44,37 @@ def test_resaving_identical_claude_entry_is_a_noop(tmp_path):
     assert connect_claude(path, settings) is None
     assert path.read_bytes() == original
     assert not list(tmp_path.glob('*.bak'))
+
+
+@pytest.mark.parametrize('destination_exists', [True, False])
+def test_atomic_replace_recovers_windows_redirected_path(tmp_path, monkeypatch, destination_exists):
+    logical = tmp_path / 'logical'
+    physical = tmp_path / 'physical'
+    physical.mkdir()
+    source, target = logical / 'staged.tmp', logical / 'settings.json'
+    (physical / source.name).write_text('new', encoding='utf-8')
+    if destination_exists:
+        (physical / target.name).write_text('old', encoding='utf-8')
+    original_replace = Path.replace
+
+    def replace(path, destination):
+        if path.parent == logical:
+            error = OSError('different volume')
+            error.winerror = 17
+            raise error
+        return original_replace(path, destination)
+
+    def resolve(path, *, strict=False):
+        resolved = physical / path.name
+        if strict and not resolved.exists():
+            raise FileNotFoundError(path)
+        return resolved
+
+    monkeypatch.setattr(Path, 'replace', replace)
+    monkeypatch.setattr(Path, 'resolve', resolve)
+    replace_local_file(source, target)
+    assert (physical / target.name).read_text(encoding='utf-8') == 'new'
+    assert not (physical / source.name).exists()
 
 
 def test_settings_permission_failure_identifies_data_target(monkeypatch):
