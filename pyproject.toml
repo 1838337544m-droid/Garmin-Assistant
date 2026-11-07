@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "garmin-assistant-api"
-version = "0.1.4"
+version = "0.1.5"
 description = "Garmin Assistant (API edition) | Garmin 助手（API）版本: local sync, running recovery guidance and extensible MCP"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
 authors = [{name = "1838337544m-droid"}]
-dependencies = ["mcp>=1.30,<2", "garmin-connect-personal-api-python>=1.0,<2", "tzdata>=2025.2"]
+dependencies = ["mcp>=1.30,<2", "garmin-connect-personal-api-python>=1.0,<2", "tzdata>=2025.2", "httpx>=0.28,<1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "build>=1.2,<2"]

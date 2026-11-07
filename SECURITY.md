@@ -10,6 +10,8 @@ The service runs locally, but your connected AI receives the tool results you us
 health data never leaves your computer. Garmin requests go to the official Personal API. Research
 requests send search terms, not health data, to PubMed/Europe PMC.
 
+DeepSeek chat asks for consent before connecting. It sends recent chat history, Garmin results used in the answer, and custom workflows you select by number to `api.deepseek.com`. Its separate API key is read from a hidden terminal prompt or `DEEPSEEK_API_KEY` and used for API authentication. [DeepSeek setup](docs/CLIENTS.md#deepseek-api)
+
 stdio does not listen on a network port. This edition has no remote HTTP/OAuth service. Do not expose
 personal data through an unauthenticated tunnel. A ChatGPT remote connector is a separate connection path.
 
@@ -34,6 +36,8 @@ health data or a sensitive reproducer and ask the maintainer to arrange private 
 本项目本地运行，但连接的 AI 会接收你调用工具得到的健康数据；
 这不等于健康数据永不离开电脑。Garmin 请求发送至官方 Personal API，
 文献请求发送检索词至 PubMed/Europe PMC，不发送健康数据。
+
+DeepSeek 聊天在连接前会征求同意，并将最近的问答、用到的 Garmin 结果与按编号选中的自定义流程发送至 `api.deepseek.com`。其独立密钥由终端隐藏输入或 `DEEPSEEK_API_KEY` 提供，用于 API 认证。[DeepSeek 接入](docs/CLIENTS.md#deepseek-api-接入)
 
 stdio 不监听网络端口。本版没有远程 HTTP/OAuth 服务，不要通过未认证的
 隧道把个人数据公开。网页 ChatGPT 远程连接器不等于本地 stdio 接入。

@@ -71,6 +71,12 @@ try {
         $shortcut.Arguments = '-m garmin_assistant setup'
         $shortcut.WorkingDirectory = $versionDir
         $shortcut.Save()
+        $chatShortcutPath = Join-Path ([Environment]::GetFolderPath('Programs')) 'Garmin Assistant DeepSeek.lnk'
+        $chatShortcut = $shellObject.CreateShortcut($chatShortcutPath)
+        $chatShortcut.TargetPath = $venvPython
+        $chatShortcut.Arguments = '-m garmin_assistant deepseek'
+        $chatShortcut.WorkingDirectory = $versionDir
+        $chatShortcut.Save()
         # This is an interactive setup window explicitly opened by the user.
         & $venvPython -m garmin_assistant setup
         if ($LASTEXITCODE -ne 0) { throw 'Setup window could not start. Check Tcl/Tk and the installation guide.' }

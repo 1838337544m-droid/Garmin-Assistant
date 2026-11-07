@@ -7,7 +7,7 @@ This is an independent project, not an official Garmin product. Garmin and Garmi
 of their respective owners. Each user uses their own key for the official Personal API.
 
 Runtime dependencies include Garmin's `garmin-connect-personal-api-python` (Apache-2.0), MCP Python SDK
-(MIT), and tzdata under its included license. Dependencies are installed from package indexes, not
+(MIT), HTTPX (BSD-3-Clause), and tzdata under its included license. Dependencies are installed from package indexes, not
 embedded in this source repository. Check installed metadata for transitive dependency licenses.
 
 The following projects were examined for public installation/update patterns, not copied implementations:
@@ -28,7 +28,7 @@ See [sources and verification](docs/REFERENCES.md).
 商标归各自权利人所有。使用官方 Personal API，各用户仅使用自己的密钥。
 
 运行时使用 Garmin 官方 `garmin-connect-personal-api-python`（Apache-2.0）、
-MCP Python SDK（MIT）以及 tzdata（其自带许可）。安装器从包索引安装依赖，
+MCP Python SDK（MIT）、HTTPX（BSD-3-Clause）以及 tzdata（其自带许可）。安装器从包索引安装依赖，
 源码仓库不内嵌这些依赖的代码。具体传递依赖许可请查所安装版本元数据。
 
 参考项目只用于研究公开的安装/更新模式，未复制其实现：

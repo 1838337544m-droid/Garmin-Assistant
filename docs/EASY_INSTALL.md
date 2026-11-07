@@ -46,6 +46,7 @@ Do not disable security controls; use your administrator's approved process or t
 |---|---|
 | Claude Desktop | Adds a local MCP entry, preserving other servers and backing up the original JSON file. |
 | Codex CLI | Uses installed `codex mcp add`; backs up `CODEX_HOME/config.toml` or `~/.codex/config.toml` first. Missing CLI is reported as failure. |
+| DeepSeek API | Saves Garmin settings for the local DeepSeek chat. Open **Garmin Assistant DeepSeek** from Start after setup. See [DeepSeek API](CLIENTS.md#deepseek-api). |
 | Export only / 仅导出（豆包等） | Saves a nonsecret `client-config.json` in your personal data directory. Import it only if the client supports local stdio MCP. This does not automatically connect Doubao. |
 
 For Claude, use the config file opened by the client's **Edit Config** command. The displayed path
@@ -135,6 +136,7 @@ Windows 或组织策略可能阻止下载脚本；请遵循管理员认可的方
 |---|---|
 | Claude Desktop | 添加本地 MCP 条目，保留其他服务，修改前备份原 JSON 文件。 |
 | Codex CLI | 调用已安装的 `codex mcp add`，先备份 `CODEX_HOME/config.toml` 或 `~/.codex/config.toml`；找不到 CLI 会明确失败。 |
+| DeepSeek API | 保存佳明设置，随后从开始菜单打开 **Garmin Assistant DeepSeek**。详见 [DeepSeek 接入](CLIENTS.md#deepseek-api-接入)。 |
 | Export only / 仅导出（豆包等） | 在个人数据目录导出不含密钥值的 `client-config.json`；仅供支持本地 stdio MCP 的客户端导入，不会自动连接豆包。 |
 
 Claude 配置路径以客户端“**编辑配置 / Edit Config**”打开的文件为准。窗口显示的是常见默认路径，微软商店版可能不同，可点击“浏览”选择正确文件。

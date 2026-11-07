@@ -3,6 +3,17 @@
 
 ## English version
 
+### DeepSeek API
+
+1. Install Garmin Assistant v0.1.5 or later. In **Garmin Assistant Setup**, choose **DeepSeek API**, save your Garmin settings and check the Garmin connection.
+2. Open **Garmin Assistant DeepSeek** from the Windows Start menu. On macOS/Linux or a manual installation, run `garmin-assistant deepseek` from the installed environment.
+3. Choose **Flash** (`deepseek-flash`) or **V4 Pro** (`deepseek-v4-pro`). Type `yes` after reading the data-sharing notice, then enter your DeepSeek API key at the hidden terminal prompt. The key can also be supplied with `DEEPSEEK_API_KEY`.
+4. Select a numbered function or ask a question. Try **2** for tomorrow’s training assessment. Type `/quit` to exit.
+
+This terminal client uses the DeepSeek API's non-thinking tool-calling mode. It sends recent chat history, relevant Garmin health and activity results (which may include location), and custom workflows you select by number. DeepSeek bills API usage to your account. Garmin and DeepSeek require separate credentials. Keep the Garmin key in local setup and enter the DeepSeek key only at the credential prompt. Your model key is held for the session. [DeepSeek API platform](https://platform.deepseek.com/) · [Official model and tool support](https://api-docs.deepseek.com/quick_start/pricing/)
+
+To preselect a model, use `garmin-assistant deepseek --model deepseek-v4-pro` or pass `deepseek-flash`. The existing MCP connection can also be used by a compatible local host configured separately for DeepSeek. [DeepSeek’s Codex configuration guide](https://api-docs.deepseek.com/quick_start/agent_integrations/codex/)
+
 For guided connection, use the [local setup wizard](EASY_INSTALL.md#english-version).
 It can merge Claude configuration or invoke the installed Codex CLI after a backup.
 The manual examples below remain available. This project still does not ship an `.mcpb` extension.
@@ -131,6 +142,17 @@ example alone is not proof of client compatibility.
 ---
 
 ## 中文版本
+
+### DeepSeek API 接入
+
+1. 安装佳明助手 v0.1.5 或更新版本。在 **Garmin Assistant Setup** 中选择 **DeepSeek API**，保存 Garmin 设置并检查连接。
+2. 从 Windows 开始菜单打开 **Garmin Assistant DeepSeek**。macOS、Linux 或手动安装的用户可在已安装环境中运行 `garmin-assistant deepseek`。
+3. 选择 **Flash**（`deepseek-flash`）或 **V4 Pro**（`deepseek-v4-pro`）。阅读数据发送说明，输入 `yes` 后，在终端隐藏输入框填写 DeepSeek API 密钥。也可通过环境变量 `DEEPSEEK_API_KEY` 提供密钥。
+4. 输入编号或自然语言提问。例如输入 **2** 分析明天的训练。输入 `/quit` 退出。
+
+此终端客户端使用 DeepSeek API 的非思考模式调用工具。发送内容包括最近的问答、用到的 Garmin 健康和活动结果（可能含位置），以及你按编号选中的自定义流程。模型用量由 DeepSeek 账户计费。Garmin 与 DeepSeek 使用不同的密钥，请分别填写在本机设置和终端密钥提示中。模型密钥仅供当前会话使用。[DeepSeek API 平台](https://platform.deepseek.com/) · [官方模型及工具支持](https://api-docs.deepseek.com/quick_start/pricing/)
+
+可用 `garmin-assistant deepseek --model deepseek-v4-pro` 直接选定模型，也可将模型名换成 `deepseek-flash`。如果已在兼容的本地客户端中配置 DeepSeek，也可以继续使用原有 Garmin MCP 接入。[DeepSeek 官方 Codex 接入说明](https://api-docs.deepseek.com/quick_start/agent_integrations/codex/)
 
 想减少手动配置，可使用[本地设置窗口](EASY_INSTALL.md#中文版本)，
 在备份后自动合并 Claude 配置或调用已安装的 Codex CLI。下面保留手动方式，尚未提供 `.mcpb` 扩展。

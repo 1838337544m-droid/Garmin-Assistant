@@ -3,6 +3,11 @@
 
 ## English version
 
+### 0.1.5 — DeepSeek chat
+
+- Added local chat with DeepSeek Flash and V4 Pro using the existing Garmin tools.
+- Added the DeepSeek setup choice and Windows Start-menu shortcut. The chat uses a separate DeepSeek API key and asks before sending questions and tool results to DeepSeek.
+
 ### 0.1.4 — Guided local installation
 
 - Added English/Chinese AI installation prompts and two README entry points.
@@ -43,6 +48,11 @@
 ---
 
 ## 中文版本
+
+### 0.1.5 — DeepSeek 聊天
+
+- 新增 DeepSeek Flash 和 V4 Pro 本地聊天入口，复用现有佳明工具。
+- 设置窗口新增 DeepSeek 选项，Windows 新增开始菜单快捷方式。聊天使用独立的 DeepSeek API 密钥，发送问题和工具结果前会询问用户。
 
 ### 0.1.4 — 本地引导安装
 

@@ -12,6 +12,7 @@
 With a local AI agent, copy the installation prompt. Otherwise download the release's
 **Windows-Installer.zip**, extract all files and double-click **Install.cmd**.
 The local setup window lets you choose English/中文, enter your key privately and select a client.
+For DeepSeek Flash or V4 Pro, choose **DeepSeek API** in setup and open **Garmin Assistant DeepSeek**. [DeepSeek setup](docs/CLIENTS.md#deepseek-api)
 Internet is required. Ordinary web chats cannot install local software by receiving a prompt.
 
 Use your own Garmin Personal API key to sync activity and health data locally,
@@ -140,6 +141,7 @@ See [verification scope](docs/REFERENCES.md) and [self-check records](docs/SELF_
 
 如果 AI 能操作你的电脑，复制安装指令即可；否则在发布页下载 **Windows-Installer.zip**，
 完整解压后双击 **Install.cmd**。本地窗口会让你选择中文／English、私密输入密钥并选择客户端。
+使用 DeepSeek Flash 或 V4 Pro 时，在设置中选 **DeepSeek API**，然后打开 **Garmin Assistant DeepSeek**。[DeepSeek 接入说明](docs/CLIENTS.md#deepseek-api-接入)
 安装需要联网；普通网页聊天不能只凭收到一段指令就在电脑上安装软件。
 
 用自己的 Garmin Personal API 密钥，在本机同步运动与健康数据，让 AI 结合

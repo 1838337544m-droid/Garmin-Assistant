@@ -46,7 +46,7 @@ class SetupWindow:
         ttk.Button(self.frame,text=self.text('Open Garmin key page','打开 Garmin 密钥页面'),command=lambda:webbrowser.open('https://connect.garmin.com/app/settings/personalApiToken')).pack(anchor='w',pady=5)
         ttk.Label(self.frame,text=self.text('AI client','AI 客户端')).pack(anchor='w')
         self.client=tk.StringVar(value='Claude Desktop')
-        ttk.Combobox(self.frame,textvariable=self.client,state='readonly',values=['Claude Desktop','Codex CLI','Export only / 仅导出（豆包等）']).pack(fill='x')
+        ttk.Combobox(self.frame,textvariable=self.client,state='readonly',values=['Claude Desktop','Codex CLI','DeepSeek API','Export only / 仅导出（豆包等）']).pack(fill='x')
         ttk.Label(self.frame,text=self.text('Claude config file (use the file opened by Edit Config)','Claude 配置文件（以客户端“编辑配置”打开的文件为准）')).pack(anchor='w',pady=(7,0))
         row=ttk.Frame(self.frame);row.pack(fill='x');self.path=tk.StringVar(value=str(default_claude_path()))
         ttk.Entry(row,textvariable=self.path).pack(side='left',fill='x',expand=True)
@@ -90,6 +90,9 @@ class SetupWindow:
             self.settings=settings
             if client=='Claude Desktop':backup=connect_claude(path,settings,replace)
             elif client=='Codex CLI':backup=connect_codex(settings,replace)
+            elif client=='DeepSeek API':
+                return self.text('Garmin settings saved. Check the Garmin connection, then open Garmin Assistant DeepSeek from the Windows Start menu, or run garmin-assistant deepseek in your installed environment.',
+                                 '佳明设置已保存。检查 Garmin 连接后，从 Windows 开始菜单打开 Garmin Assistant DeepSeek，或在已安装环境中运行 garmin-assistant deepseek。')
             else:
                 target=settings.data_dir/'client-config.json';atomic_json(target,{'mcpServers':{'garmin-assistant':client_entry(settings)}})
                 return self.text('Settings saved. Configuration exported to: ','设置已保存。配置导出至：')+str(target)+'\n'+self.text('Import only if your client supports local stdio MCP. This does not connect ordinary web/mobile chats.','仅适用于支持本地 stdio MCP 的客户端，普通网页／手机聊天不能直接连接。')

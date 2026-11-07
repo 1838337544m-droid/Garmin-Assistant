@@ -20,6 +20,8 @@ def main():
     commands=parser.add_subparsers(dest='command',required=True)
     commands.add_parser('serve',help='Start local stdio MCP')
     commands.add_parser('setup',help='Open local graphical setup; never paste a key into AI chat')
+    deepseek=commands.add_parser('deepseek',help='Chat with DeepSeek using Garmin tools')
+    deepseek.add_argument('--model',choices=['deepseek-flash','deepseek-v4-pro'])
     init=commands.add_parser('init');init.add_argument('--timezone',default=None);init.add_argument('--goal-km',type=float);init.add_argument('--goal-minutes',type=float)
     init.add_argument('--language',choices=['zh','en'])
     commands.add_parser('welcome',help='Show bilingual welcome and language choices')
@@ -42,6 +44,9 @@ def main():
         if args.command=='setup':
             from .gui_setup import run
             run();return
+        if args.command=='deepseek':
+            from .deepseek import run
+            raise SystemExit(run(settings,args.model))
         if args.command=='welcome' or (args.command=='language' and not args.selection):
             print(welcome(settings)['message']);return
         if args.command=='language':
