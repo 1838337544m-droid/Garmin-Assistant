@@ -5,7 +5,9 @@ from statistics import median, quantiles
 
 from .readiness import number, object_or_empty
 from .goals import SPORTS, validate_goal
+from .training_evidence import HRV_RULE, hrv_guided_rule, matched_speed_change, training_evidence
 RECOVERY_SOURCES = [
+    {'id': 'hrv_guided2025', 'title': 'Impact of heart rate variability-based exercise prescription', 'year': 2025, 'url': HRV_RULE},
     {'id': 'kellmann2018', 'title': 'Recovery and Performance in Sport: Consensus Statement', 'year': 2018,
      'url': 'https://pubmed.ncbi.nlm.nih.gov/29345524/'},
     {'id': 'saw2016', 'title': 'Monitoring the athlete training response', 'year': 2016,
@@ -144,9 +146,11 @@ def training_status(history, as_of, language):
             same_type = [row for row in rows if activity_kind(row) == kind]
             prior_type = [row for row in earlier if activity_kind(row) == kind]
             by_type.append({'type': kind, **activity_totals(same_type), 'performance': performance(same_type, family),
-                            'previous_performance': performance(prior_type, family)})
+                            'previous_performance': performance(prior_type, family),
+                            'matched_speed': matched_speed_change(same_type, prior_type) if family in ('cycling', 'running') else None})
         sports.append({'sport': family, **activity_totals(rows), 'sessions_per_week': round(len(rows) * 7 / 30, 1),
-                       'previous_30d': activity_totals(earlier), 'by_activity_type': by_type})
+                       'previous_30d': activity_totals(earlier), 'by_activity_type': by_type,
+                       'training_evidence': training_evidence(rows, earlier)})
     note = ('训练量与同类活动的配速或速度变化属于记录趋势。路线、天气、泳池条件和强度不同都会影响对比，判断训练成效需要条件相近的表现测试。'
             if language == 'zh' else 'Volume and same-type pace or speed changes describe recorded trends. Routes, weather, pool conditions and effort affect comparisons. Assess training effects with comparable performance tests.')
     return {'as_of': as_of, 'activity_window': {'start_date': start.isoformat(), 'end_date': as_of,
@@ -157,6 +161,9 @@ def training_status(history, as_of, language):
 
 def recovery_status(history, as_of, subjective, fresh, language):
     body = health_overview(history, as_of)
+    hrv = health_series(history, date.fromisoformat(body['start_date']), date.fromisoformat(body['end_date']))['hrv_ms']
+    cutoff = body['recent_start']
+    model = hrv_guided_rule([v for day, v in hrv.items() if day < cutoff], [v for day, v in hrv.items() if day >= cutoff])
     if subjective is not None and not isinstance(subjective, dict):
         raise ValueError('Subjective ratings must be an object')
     subject = {name: (subjective or {}).get(name) for name in ('fatigue_0_10', 'soreness_0_10')}
@@ -172,12 +179,20 @@ def recovery_status(history, as_of, subjective, fresh, language):
     if not fresh:
         missing.append('fresh_complete_sync')
     cues = [key for key, (direction, _) in signals.items() if body['metrics'][key]['comparison'] == direction]
+    if model['status'] == 'below_threshold':
+        if 'hrv_ms' not in cues:
+            cues.insert(0, 'hrv_ms')
+        evidence['hrv_ms'] = 'hrv_guided2025'
     high_subjective = [key for key, value in subject.items() if value is not None and value >= 7]
     cues.extend(high_subjective)
     evidence.update({key: 'saw2016' for key in subject})
     end = date.fromisoformat(as_of)
     load = {'recent_7d': activity_totals(activities_between(history, end - timedelta(days=6), end)),
             'prior_7d': activity_totals(activities_between(history, end - timedelta(days=13), end - timedelta(days=7)))}
+    recent, prior = load['recent_7d'], load['prior_7d']
+    volume_increased = (recent['duration_sessions'] == recent['sessions'] and prior['duration_sessions'] == prior['sessions']
+                        and recent['duration_min_recorded'] is not None and prior['duration_min_recorded'] is not None
+                        and recent['duration_min_recorded'] > prior['duration_min_recorded'])
     decision = ('recovery_caution' if high_subjective or len(cues) >= 2 else
                 'insufficient_data' if missing else 'mixed_signals' if cues else 'no_elevated_signal_detected')
     descriptions = {
@@ -186,7 +201,21 @@ def recovery_status(history, as_of, subjective, fresh, language):
         'mixed_signals': ('有单项偏离，请结合主观感受和后续趋势复评。', 'One signal is outside the usual range. Review it alongside how you feel and the next observations.'),
         'no_elevated_signal_detected': ('目前未发现所检查的偏离，仍需结合当天感受。', 'The checked signals show no elevated cue. Consider how you feel on the day.'),
     }
+    if not fresh:
+        action = ('先补齐同步再决定训练强度。', 'Complete the sync before choosing training intensity.')
+    elif cues:
+        action = ('下一次把间歇、冲刺或长课换成轻松训练，或休息。次日复查 HRV、静息心率和主观感受。',
+                  'Replace the next interval, sprint or long session with easy exercise or rest. Recheck HRV, resting heart rate and how you feel the next day.')
+        if volume_increased:
+            action = ('近 7 天记录的训练时长高于前一周，同时出现恢复信号。' + action[0],
+                      'Recorded training time increased alongside recovery cues. ' + action[1])
+    elif missing:
+        action = ('补齐下列缺项后再决定是否安排强度课。', 'Fill the listed gaps before scheduling a hard session.')
+    else:
+        action = ('可按原计划安排轻松训练。强度课仍需结合当天症状和近期训练安排。',
+                  'An easy session can stay on the schedule. Check symptoms and your recent training before scheduling a hard session.')
     return {'as_of': as_of, 'status': decision, 'summary': descriptions[decision][language != 'zh'],
+            'next_session_action': action[language != 'zh'], 'hrv_guided_model': model,
             'body_status': body, 'subjective': subject, 'training_volume': load, 'missing': missing,
             'cues': cues, 'signal_evidence': evidence, 'sources': [dict(source) for source in RECOVERY_SOURCES],
             'method': {'baseline_days': 83, 'recent_days': 7, 'min_baseline_observations': 21,
@@ -289,18 +318,67 @@ def render_monitoring_report(result):
             name = SPORTS.get(sport['sport'], (sport['sport'], sport['sport']))[not zh]
             lines.append(f"| {name} | {sport['sessions']} | {sport['sessions_per_week']} | {shown(sport['duration_min_recorded'])} | {shown(sport['distance_km_recorded'])} | {shown(sport['median_session_avg_hr_bpm'])} | {sport['previous_30d']['sessions']} |")
         for sport in result['sports']:
+            if sport['sessions']:
+                evidence = sport['training_evidence']
+                name = SPORTS.get(sport['sport'], (sport['sport'], sport['sport']))[not zh]
+                lines += ['', f'### {name} · {local("训练刺激与能力变化", "Training stimulus and capacity")}', '']
+                for key, label in (('aerobic', local('有氧', 'Aerobic')), ('anaerobic', local('无氧', 'Anaerobic'))):
+                    current, prior = evidence[key], evidence[f'prior_{key}']
+                    def count(period):
+                        return f"{period['sessions_at_least_3']}/{period['sessions_with_score']}" if period['sessions_with_score'] else local('缺测', 'Unavailable')
+                    lines.append(f'- {label} · ' + local('训练效果达到 3.0 的场次 / 有评分场次，近 30 天与前 30 天 ',
+                                                             'Sessions with Training Effect ≥3.0 / scored sessions, recent vs prior 30 days ')
+                                 + f'{count(current)} vs {count(prior)}')
+                if sport['sport'] in SPORTS:
+                    vo2 = evidence['vo2max_estimates']
+                    line = f"- VO₂max · {shown(vo2['prior_median'])} → {shown(vo2['recent_median'])} mL/kg/min"
+                    if vo2['change'] is not None:
+                        line += f" ({vo2['change']:+g}) " + local('设备估计中位数变化', 'change in median device estimates')
+                    else:
+                        line += ' · ' + local('同项目估计样本不足以比较趋势', 'Insufficient same-sport estimates for a trend')
+                    lines.append(line)
+                for key, label in (('activity_kcal', local('运动估算消耗（kcal）', 'Estimated activity expenditure (kcal)')),
+                                   ('strength_sets', local('记录组数', 'Recorded sets')), ('strength_reps', local('记录次数', 'Recorded repetitions'))):
+                    entry = evidence[key]
+                    if entry['sessions_with_value']:
+                        lines.append(f"- {label} · {entry['total']:g} ({entry['sessions_with_value']} {local('次活动', 'sessions')})")
+                if result['sync']['fresh'] and sport['sport'] in SPORTS:
+                    aerobic, anaerobic = evidence['aerobic'], evidence['anaerobic']
+                    if aerobic['sessions_at_least_3'] and anaerobic['sessions_with_score'] >= 3 and not anaerobic['sessions_at_least_3']:
+                        lines.append('- ' + local('有氧刺激已有记录，无氧刺激在有评分的课里较少。若目标是耐力，继续把重点放在可恢复的有氧训练；若目标是短距离速度，先用同项目的短距离测试建立基线。',
+                                                 'The recorded sessions show aerobic stimulus and limited anaerobic stimulus. For endurance, prioritize sustainable aerobic work. For short-distance speed, establish a baseline with a repeatable test in this sport.'))
             for activity in sport['by_activity_type']:
                 if (metric := activity['performance']) is not None:
                     prior = activity['previous_performance']
                     lines.append(f"\n- {activity['type']} · {shown(metric['median'])} {metric['unit']} ({metric['sessions']} {local('次', 'sessions')}) · {local('前 30 天', 'Prior 30 days')} {shown(prior['median'])} ({prior['sessions']} {local('次', 'sessions')})")
+                matched = activity['matched_speed']
+                if matched and matched['median_speed_change_pct'] is not None:
+                    lines.append(f"- {local('相近心率与时长的配对', 'Pairs with similar heart rate and duration')} {matched['pairs']} · "
+                                 + local('速度变化中位数', 'median speed change') + f" {matched['median_speed_change_pct']:+g}%. "
+                                 + local('匹配条件为同活动类型、平均心率差不超过 5 bpm、时长差不超过 20%。',
+                                         'Pairs use the same activity type, mean HR within 5 bpm and duration within 20%.'))
         if not result['sports']:
             lines += ['', local('目前无可用运动记录。', 'No activity records are available.')]
         lines += ['', result['interpretation'], '']
+        if result['sports']:
+            lines += [local('有氧和无氧训练效果用于描述训练刺激。要判断能力变化，可在相近路线、时长和强度下重复测试。力量组次用于记录训练量，可在同动作和相近用力程度下比较重量或完成次数。',
+                            'Aerobic and anaerobic Training Effect describe the training stimulus. Assess capacity with repeated tests under comparable conditions. Strength sets and reps describe volume. Compare weight or reps for the same exercise at similar effort.'),
+                      f"[Garmin Training Effect]({result['sports'][0]['training_evidence']['stimulus_source']})", '']
     if 'summary' in recovery:
-        lines += [recovery['summary'], '',
+        lines += [recovery['summary'], '', recovery['next_session_action'], '',
                   local('自评疲劳 / 酸痛（0–10）', 'Reported fatigue / soreness (0–10)') + f"  {shown(recovery['subjective']['fatigue_0_10'])} / {shown(recovery['subjective']['soreness_0_10'])}",
                   local('近 7 天 / 前 7 天训练分钟', 'Recorded minutes, recent / prior 7 days') + '  ' + ' / '.join(shown(recovery['training_volume'][period]['duration_min_recorded']) for period in ('recent_7d', 'prior_7d')), '',
                   local('提示指标', 'Recovery cues') + '  ' + (', '.join(recovery['cues']) or local('暂无', 'None recorded')), '', recovery['method']['note'], '']
+        model = recovery['hrv_guided_model']
+        if model['status'] == 'insufficient_data':
+            lines.append(local('HRV 模型需要至少 21 个基线夜，且近 7 天至少 5 个有效夜。', 'The HRV rule requires at least 21 baseline nights and five valid nights in the latest seven.'))
+        else:
+            relation = local('低于', 'below') if model['status'] == 'below_threshold' else local('达到或高于', 'at or above')
+            lines.append(local('近期 HRV 几何平均值', 'Recent HRV geometric mean') + f" {model['recent_geomean_ms']:g} ms · {relation} "
+                         + local('个人下界', 'personal lower limit') + f" {model['lower_limit_ms']:g} ms")
+        lines += [local('规则取 ln(HRV) 基线均值减 0.5 个标准差作为下界。本应用用 Garmin 夜间数据替代论文中的晨间测量。',
+                        'The lower limit is baseline mean ln(HRV) minus 0.5 standard deviations. This adaptation uses Garmin nightly HRV in place of the study’s morning measurements.')
+                  + f" [2025]({model['reference']})", '']
     labels = {
         'hrv_ms': local('夜间 HRV（ms）', 'Nightly HRV (ms)'), 'resting_hr_bpm': local('静息心率（bpm）', 'Resting HR (bpm)'),
         'sleep_hours': local('睡眠时长（h）', 'Sleep duration (h)'), 'daily_spo2_pct': local('日均血氧（%）', 'Daily SpO₂ (%)'),

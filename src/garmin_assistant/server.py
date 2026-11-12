@@ -37,6 +37,7 @@ mcp = FastMCP('Garmin 助手（API）版本', instructions=(
     'Cache lasts 15 minutes; use refresh=true when the user asks for latest data. '
     'Report stale status and fetched_at when a refresh fails. '
     'Garmin calendar dates and returned units are authoritative; missing data is not zero. '
+    'For standalone menu 1, report sync result and gaps only. For menu 2, explain evidence of capacity changes separately from the stimulus and use coverage to guide the next practical step. For menu 3, explain the calculated HRV boundary, measured and subjective cues, and the next-session action. Use the research as support for the interpretation. '
     'Only data synced to Garmin Connect is available. These are read-only tools. '
     'For trends, query ranges; paginate activities with start/limit. '
     'Unavailable metrics such as training readiness must not be fabricated. '

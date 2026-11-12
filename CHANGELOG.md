@@ -3,6 +3,11 @@
 
 ## English version
 
+### 0.2.1 — Interpreting training and recovery
+
+- Training reports compare recorded aerobic and anaerobic stimulus, VO₂max estimates, and speed at similar heart rate and duration. They also summarize recorded strength volume and activity energy expenditure.
+- Recovery reports apply an adapted HRV decision rule and combine it with resting heart rate, sleep, perceived fatigue and soreness to explain the next-session recommendation.
+
 ### 0.2.0 — Multisport training and recovery
 
 - Added the four-item primary menu, 30-day training and 90-day health reports, and personal recovery reports with citations and missing-data coverage.
@@ -68,6 +73,11 @@
 ---
 
 ## 中文版本
+
+### 0.2.1 — 训练成效解读与恢复建议
+
+- 训练报告比较有氧与无氧刺激、VO₂max 估计和相近心率与时长下的速度，同时汇总力量训练量与运动消耗。
+- 恢复报告计算个人 HRV 下界，结合静息心率、睡眠、自评疲劳和酸痛，解释下一次训练的调整建议。
 
 ### 0.2.0 — 多项目训练与恢复
 

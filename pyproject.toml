@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "garmin-assistant-api"
-version = "0.2.0"
+version = "0.2.1"
 description = "Garmin Assistant (API edition) | Garmin 助手（API）版本: local sync, running recovery guidance and extensible MCP"
 readme = "README.md"
 requires-python = ">=3.12"

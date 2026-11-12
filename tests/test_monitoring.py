@@ -5,6 +5,7 @@ import pytest
 from garmin_assistant.monitoring import recovery_status, tomorrow_plan, training_status
 from garmin_assistant.training import TrainingWorkflow
 from garmin_assistant.config import load_settings, save_settings
+from garmin_assistant.training_evidence import matched_speed_change, training_evidence
 
 
 AS_OF = '2026-11-07'
@@ -58,6 +59,24 @@ def test_recovery_requires_subjective_ratings_and_reports_actual_signals():
     assert result['status'] == 'recovery_caution' and result['cues'] == ['hrv_ms', 'fatigue_0_10']
     assert result['body_status']['metrics']['hrv_ms']['baseline_median'] == 48
     assert result['signal_evidence']['hrv_ms'] in {source['id'] for source in result['sources']}
+    assert result['hrv_guided_model']['status'] == 'below_threshold'
+    assert result['hrv_guided_model']['recent_geomean_ms'] == 30
+    assert result['hrv_guided_model']['lower_limit_ms'] == 48
+    assert 'easy exercise or rest' in result['next_session_action']
+
+
+def test_device_scores_distinguish_missing_stimulus_from_measured_estimates():
+    recent = [{**activity(i, 'running', 5500, 1800), 'vO2MaxValue': 47, 'aerobicTrainingEffect': 3.1,
+               'calories': 330} for i in (1, 2, 3)]
+    earlier = [{**activity(i, 'running', 5000, 1800), 'vO2MaxValue': 45, 'aerobicTrainingEffect': 2.5}
+               for i in (31, 32, 33)]
+    result = training_evidence(recent, earlier)
+    assert result['aerobic']['sessions_at_least_3'] == 3
+    assert result['anaerobic']['sessions_with_score'] == 0
+    assert result['vo2max_estimates']['change'] == 2 and result['activity_kcal']['total'] == 990
+    assert matched_speed_change(recent, earlier) == {'pairs': 3, 'median_speed_change_pct': 10}
+    recent[0]['averageHR'] += 10
+    assert matched_speed_change(recent, earlier)['median_speed_change_pct'] is None
 
 
 @pytest.mark.parametrize('sport,distance,minutes,expected,unit', [
