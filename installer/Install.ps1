@@ -59,11 +59,17 @@ try {
     }
     & $venvPython -m pip install --disable-pip-version-check $wheels[0].FullName
     if ($LASTEXITCODE -ne 0) { throw 'Package installation failed. Check internet/proxy settings and retry. Existing user data has been preserved.' }
+    # Repair/reinstall the provided wheel even when its version is already present.
+    & $venvPython -m pip install --disable-pip-version-check --force-reinstall --no-deps $wheels[0].FullName
+    if ($LASTEXITCODE -ne 0) { throw 'Application repair failed. Existing user data has been preserved.' }
     & $venvPython -c "import tkinter; from garmin_assistant import __version__; assert __version__ == '$version'"
     if ($LASTEXITCODE -ne 0) { throw 'Installed runtime check failed.' }
     Write-Host "Installed: $venvPython"
     $dashboardShell = New-Object -ComObject WScript.Shell
-    $dashboardShortcut = $dashboardShell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Programs')) '打开训练日报.lnk'))
+    $programsDir = [Environment]::GetFolderPath('Programs')
+    New-Item -ItemType Directory -Path $programsDir -Force | Out-Null
+    $dashboardShortcut = $dashboardShell.CreateShortcut((Join-Path $programsDir 'Garmin Assistant Daily.lnk'))
+    $dashboardShortcut.Description = 'Open training dashboard / Daily training report'
     $dashboardShortcut.TargetPath = Join-Path $venvDir 'Scripts\pythonw.exe'
     $dashboardShortcut.Arguments = '-m garmin_assistant dashboard'
     $dashboardShortcut.WorkingDirectory = $versionDir

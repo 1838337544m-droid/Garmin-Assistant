@@ -60,6 +60,18 @@ def current_workflow():
     return TrainingWorkflow(service,DATA,settings=load_settings())
 
 
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False,destructiveHint=False,openWorldHint=False))
+def garmin_open_training_dashboard() -> dict:
+    """Open the interactive local training dashboard in the user's browser."""
+    import subprocess
+    import sys
+    python=Path(sys.executable)
+    if os.name=='nt' and python.with_name('pythonw.exe').exists():
+        python=python.with_name('pythonw.exe')
+    subprocess.Popen([str(python),'-m','garmin_assistant','dashboard'])
+    return {'launched':True,'message':'已启动训练日报，页面将在本机浏览器打开。'}
+
+
 @mcp.tool(annotations=READ_ONLY)
 def garmin_status() -> dict:
     """Get local cache coverage, freshness policy and credential-file presence; no network call."""

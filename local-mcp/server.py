@@ -52,6 +52,18 @@ def today():
     return datetime.now(timezone(timedelta(hours=4))).date().isoformat()
 
 
+@mcp.tool(annotations=ToolAnnotations(readOnlyHint=False,destructiveHint=False,openWorldHint=False))
+def garmin_open_training_dashboard() -> dict:
+    """Open the local interactive training dashboard in the browser."""
+    import subprocess
+    import sys
+    executable=Path(sys.executable)
+    if os.name=='nt' and executable.with_name('pythonw.exe').exists():
+        executable=executable.with_name('pythonw.exe')
+    subprocess.Popen([str(executable),str(ROOT/'cli.py'),'dashboard'],cwd=str(ROOT))
+    return {'launched':True}
+
+
 @mcp.tool(annotations=READ_ONLY)
 def garmin_status() -> dict:
     """Get local cache coverage, freshness policy and credential-file presence; no network call."""

@@ -49,6 +49,22 @@ CLASSIC_MODELS = [
 ]
 
 
+def replace_local_file(staged, destination):
+    try:
+        staged.replace(destination)
+    except OSError as error:
+        if getattr(error,'winerror',None)!=17:
+            raise
+        source=staged.resolve(strict=True)
+        try:
+            target=destination.resolve(strict=True)
+        except FileNotFoundError:
+            target=source.with_name(destination.name)
+        if target!=source.with_name(destination.name):
+            raise
+        source.replace(target)
+
+
 def atomic_json(path, payload):
     path.parent.mkdir(parents=True, exist_ok=True)
     # Store Python may virtualize LOCALAPPDATA onto another drive. Resolve the
@@ -57,7 +73,7 @@ def atomic_json(path, payload):
     tmp = path.with_name(path.name+'.'+uuid.uuid4().hex+'.tmp')
     try:
         tmp.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
-        tmp.replace(path)
+        replace_local_file(tmp,path)
     finally:
         tmp.unlink(missing_ok=True)
 
