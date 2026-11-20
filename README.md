@@ -1,4 +1,15 @@
 # Garmin Assistant (API edition) | Garmin 助手（API）版本
+
+### Local MCP source / 本地 MCP 完整源码
+
+The maintained local MCP source, tests and documentation are available in
+[`local-mcp/`](local-mcp/). It is a separate edition; the installers below still install
+the API edition. See [local MCP setup](local-mcp/README.md) and its
+[license](local-mcp/LICENSE) before using or redistributing it.
+
+本地 MCP 完整源码、测试和文档现同步至 [`local-mcp/`](local-mcp/)。
+现有安装器仍安装 API 版本；本地 MCP 请参阅目录内说明与许可。
+
 [English version](#english-version) | [中文版本](#中文版本)
 
 ## English version

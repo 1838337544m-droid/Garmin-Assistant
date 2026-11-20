@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.sqlite3*
+*token*.json
+verification-report.json
+reports/
+docs/upstream-auth.txt
+.env
+.env.*
+.worktrees/
