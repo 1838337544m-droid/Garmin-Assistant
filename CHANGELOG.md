@@ -144,3 +144,9 @@
 - 自定义提示词工作流采用 100 起的稳定编号，不能覆盖核心工具。
 - 配置与用户数据独立于源码；支持 Windows/macOS/Linux 的安装流程。
 - 提供 GPT/Codex、Claude、豆包接入说明以及无本地 MCP 时的报告导入方式。
+# 0.2.2
+
+- Add the local interactive training dashboard and Windows Start-menu shortcut.
+- Bundle the multisport dashboard engine with its own license.
+- Display analysis results directly in the browser with per-launch loopback authorization.
+

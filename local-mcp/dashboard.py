@@ -1,0 +1,128 @@
+# Copyright (c) 2026 1838337544m-droid. All rights reserved.
+"""Loopback-only interactive dashboard with per-launch authorization."""
+import json
+import secrets
+import threading
+import webbrowser
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs, urlsplit
+
+from athlete_profile import load_profile, save_profile, PRIMARY_SPORTS
+from report_ui import render_dashboard
+from prescription import SESSION_SPORTS
+
+
+PAGE='''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>训练日报</title>
+<style>*{box-sizing:border-box}body{background:#f1f3ef;color:#182b22;font:15px/1.6 system-ui;margin:0}main{max-width:1060px;margin:30px auto;padding:24px}.tag{letter-spacing:.17em;font-size:11px}h1{font-size:32px;font-weight:550}.panel{padding:25px;background:white;border:1px solid #dce2db;border-radius:15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}label{display:block;margin:12px 0;font-size:13px}select,input{width:100%;padding:11px;border:1px solid #c5d0c7;border-radius:7px;background:#fff;font:inherit}button{border:0;border-radius:8px;background:#19382a;color:white;padding:13px 23px;font:inherit;cursor:pointer}button:disabled{opacity:.5}#state{white-space:pre-wrap}iframe{width:100%;height:1100px;border:0;margin-top:24px;background:#f1f3ef}small{color:#68776f}fieldset{border:1px solid #dce2db;border-radius:8px;margin:18px 0} @media(max-width:650px){.grid{grid-template-columns:1fr}main{padding:15px}}</style>
+<main><div class="tag">PACE / TRAINING JOURNAL</div><h1>为明天选择合适的训练</h1><p>长期主项决定目标方向，本次项目决定执行方式。</p><form class="panel" id="form"><div class="grid"><label>长期主项<select id="primary"><option value="running">跑步</option><option value="cycling">骑车</option><option value="swimming">游泳</option><option value="climbing">攀岩</option></select></label><label>明天的运动<select id="sport"><option value="running">跑步</option><option value="cycling">骑车</option><option value="swimming">游泳</option><option value="climbing">攀岩</option><option value="other">其他</option></select></label></div><label>长期目标<input id="goal" required maxlength="500" placeholder="例如：建立稳定跑步频率，完成 10 公里"></label>
+<fieldset><legend>当前身体感受（未选择表示未知）</legend><div class="grid"><label>疼痛 0–10<input id="pain_0_10" type="number" min="0" max="10" step="0.5"></label><label>疲劳 0–10<input id="fatigue_0_10" type="number" min="0" max="10" step="0.5"></label></div><div id="checks" class="grid"></div></fieldset>
+<fieldset id="swim" hidden><legend>游泳前确认</legend><div id="swimchecks" class="grid"></div></fieldset>
+<small>提交后保存运动偏好，并同步 Garmin 数据与文献。分析可能需要几分钟；密钥仍使用已安装版本的本机设置。</small><p><button id="submit">保存选择并生成分析</button></p><div id="state" role="status" aria-live="polite"></div></form><iframe id="result" sandbox="allow-popups allow-popups-to-escape-sandbox" title="训练分析结果" hidden></iframe></main>
+<p style="max-width:1012px;margin:20px auto;padding:0 24px"><button id="close">关闭本次日报服务</button></p><script>
+const key=new URLSearchParams(location.search).get('key');
+const fields={illness:'是否生病',pain_with_walking:'是否步行痛',focal_bone_pain:'是否局部骨痛',chest_pain:'是否胸痛',fainting:'是否晕厥'};
+function choice(id,label,parent){let wrap=document.createElement('label');wrap.textContent=label;let s=document.createElement('select');s.id=id;for(const [v,t] of [['','未确认'],['false','否'],['true','是']])s.add(new Option(t,v));wrap.append(s);document.getElementById(parent).append(wrap);}
+Object.entries(fields).forEach(([k,v])=>choice(k,v,'checks'));choice('shoulder_pain','是否肩痛','swimchecks');choice('swimming_alone','是否独自下水','swimchecks');
+document.getElementById('sport').onchange=()=>{document.getElementById('swim').hidden=document.getElementById('sport').value!=='swimming'};
+const headers={'X-Dashboard-Key':key,'Content-Type':'application/json'};
+document.getElementById('close').onclick=async()=>{await fetch('/close',{method:'POST',headers});document.getElementById('state').textContent='本次日报服务已关闭，可关闭页面。';document.getElementById('submit').disabled=true;};
+fetch('/profile',{headers}).then(r=>r.json()).then(p=>{if(p.profile){document.getElementById('primary').value=p.profile.primary_sport;document.getElementById('sport').value=p.profile.primary_sport;document.getElementById('goal').value=p.profile.goal;document.getElementById('sport').onchange();}}).catch(()=>{document.getElementById('state').textContent='无法读取运动偏好，请重新打开训练日报。'});
+document.getElementById('form').onsubmit=async ev=>{ev.preventDefault();let btn=document.getElementById('submit'),state=document.getElementById('state'),frame=document.getElementById('result');btn.disabled=true;frame.hidden=true;state.textContent='正在同步 Garmin 并生成分析，请保持页面打开…';let subjective={};for(const k of ['pain_0_10','fatigue_0_10',...Object.keys(fields)]){let v=document.getElementById(k).value;if(v!=='')subjective[k]=k.endsWith('_0_10')?Number(v):v==='true';}let swim={};for(const k of ['shoulder_pain','swimming_alone']){let v=document.getElementById(k).value;if(v!=='')swim[k]=v==='true';}try{let r=await fetch('/analyze',{method:'POST',headers,body:JSON.stringify({primary_sport:document.getElementById('primary').value,goal:document.getElementById('goal').value,session_sport:document.getElementById('sport').value,subjective,swimming_safety:swim})});let data=await r.json();if(!r.ok)throw Error(data.error||'分析失败');frame.srcdoc=data.html;frame.hidden=false;state.textContent='分析完成；请查看下方建议与数据缺项。';frame.scrollIntoView({behavior:'smooth'});}catch(e){state.textContent=e.message;}finally{btn.disabled=false;}};
+</script></html>'''
+
+
+def make_server(workflow, folder):
+    token=secrets.token_urlsafe(32)
+    lock=threading.Lock()
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self,*args):
+            pass  # URLs and results may contain private data.
+
+        def respond(self,status,data,html=False):
+            payload=data.encode('utf-8') if html else json.dumps(data,ensure_ascii=False).encode('utf-8')
+            self.send_response(status)
+            self.send_header('Content-Type','text/html; charset=utf-8' if html else 'application/json; charset=utf-8')
+            self.send_header('Cache-Control','no-store')
+            self.send_header('Referrer-Policy','no-referrer')
+            self.send_header('X-Content-Type-Options','nosniff')
+            self.send_header('Content-Length',str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def authorized(self,page=False):
+            expected=f'127.0.0.1:{self.server.server_port}'
+            if self.headers.get('Host')!=expected:
+                return False
+            origin=self.headers.get('Origin')
+            if origin and origin!='http://'+expected:
+                return False
+            supplied=(parse_qs(urlsplit(self.path).query).get('key',[''])[0] if page else self.headers.get('X-Dashboard-Key',''))
+            return secrets.compare_digest(supplied,token)
+
+        def do_GET(self):
+            route=urlsplit(self.path).path
+            if not self.authorized(route=='/'):
+                return self.respond(403,{'error':'请使用启动时打开的页面。'})
+            if route=='/':
+                return self.respond(200,PAGE,True)
+            if route=='/profile':
+                try:
+                    return self.respond(200,{'profile':load_profile(folder)})
+                except ValueError:
+                    return self.respond(200,{'profile':None})
+            self.respond(404,{'error':'页面不存在'})
+
+        def do_POST(self):
+            if not self.authorized():
+                return self.respond(403,{'error':'页面授权已失效，请重新打开日报。'})
+            if urlsplit(self.path).path=='/close':
+                self.respond(200,{'closed':True})
+                threading.Thread(target=self.server.shutdown,daemon=True).start()
+                return
+            if urlsplit(self.path).path!='/analyze':
+                return self.respond(404,{'error':'页面不存在'})
+            if not lock.acquire(blocking=False):
+                return self.respond(409,{'error':'已有分析进行中，请等待完成。'})
+            try:
+                size=int(self.headers.get('Content-Length','0'))
+                if not 0<size<=8192:
+                    raise ValueError()
+                body=json.loads(self.rfile.read(size))
+                if body.get('primary_sport') not in PRIMARY_SPORTS or body.get('session_sport') not in SESSION_SPORTS:
+                    raise ValueError()
+                if not isinstance(body.get('goal'),str) or not 0<len(body['goal'].strip())<=500:
+                    raise ValueError()
+                subjective=body.get('subjective',{})
+                allowed={'pain_0_10','fatigue_0_10','illness','pain_with_walking','focal_bone_pain','chest_pain','fainting'}
+                if not isinstance(subjective,dict) or set(subjective)-allowed:
+                    raise ValueError()
+                for k,v in subjective.items():
+                    if k.endswith('_0_10'):
+                        if type(v) not in (int,float) or not 0<=v<=10: raise ValueError()
+                    elif type(v) is not bool: raise ValueError()
+                swim=body.get('swimming_safety',{})
+                if not isinstance(swim,dict) or set(swim)-{'shoulder_pain','swimming_alone'} or any(type(v) is not bool for v in swim.values()):
+                    raise ValueError()
+                save_profile(folder,body['primary_sport'],body['goal'])
+                result=workflow.assess_session(body['session_sport'],subjective=subjective,swimming_safety=swim)
+                self.respond(200,{'html':render_dashboard(result)})
+            except (ValueError,TypeError,KeyError):
+                self.respond(400,{'error':'输入无效，请检查运动、目标与身体感受。'})
+            except Exception:
+                self.respond(500,{'error':'分析未完成。请确认已在设置中配置 Garmin 密钥、网络可用，然后重试。'})
+            finally:
+                lock.release()
+
+    server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+    server.daemon_threads=True
+    return server,f'http://127.0.0.1:{server.server_port}/?key={token}'
+
+
+def run(workflow,folder):
+    server,url=make_server(workflow,folder)
+    webbrowser.open(url)
+    try:
+        server.serve_forever()
+    finally:
+        server.server_close()

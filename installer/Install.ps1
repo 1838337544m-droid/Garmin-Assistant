@@ -62,6 +62,12 @@ try {
     & $venvPython -c "import tkinter; from garmin_assistant import __version__; assert __version__ == '$version'"
     if ($LASTEXITCODE -ne 0) { throw 'Installed runtime check failed.' }
     Write-Host "Installed: $venvPython"
+    $dashboardShell = New-Object -ComObject WScript.Shell
+    $dashboardShortcut = $dashboardShell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Programs')) '打开训练日报.lnk'))
+    $dashboardShortcut.TargetPath = Join-Path $venvDir 'Scripts\pythonw.exe'
+    $dashboardShortcut.Arguments = '-m garmin_assistant dashboard'
+    $dashboardShortcut.WorkingDirectory = $versionDir
+    $dashboardShortcut.Save()
     if (-not $SkipSetup) {
         $pythonw = Join-Path $venvDir 'Scripts\pythonw.exe'
         $shellObject = New-Object -ComObject WScript.Shell

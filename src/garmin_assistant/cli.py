@@ -21,6 +21,7 @@ def main():
     commands=parser.add_subparsers(dest='command',required=True)
     commands.add_parser('serve',help='Start local stdio MCP')
     commands.add_parser('setup',help='Open local graphical setup; never paste a key into AI chat')
+    commands.add_parser('dashboard',help='Open the interactive local training dashboard')
     deepseek=commands.add_parser('deepseek',help='Chat with DeepSeek using Garmin tools')
     deepseek.add_argument('--model',choices=['deepseek-flash','deepseek-v4-pro'])
     init=commands.add_parser('init');init.add_argument('--timezone',default=None);init.add_argument('--goal-km',type=float);init.add_argument('--goal-minutes',type=float)
@@ -47,6 +48,12 @@ def main():
     args=parser.parse_args(args_in)
     try:
         settings=load_settings();menus=MenuStore(settings.data_dir/'menu-preferences.json')
+        if args.command=='dashboard':
+            from garmin_local.dashboard import run
+            from garmin_local.training import TrainingWorkflow
+            from .server import service, DATA
+            run(TrainingWorkflow(service,DATA),DATA)
+            return
         if args.command=='serve':
             from .server import run
             run();return

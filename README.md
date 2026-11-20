@@ -1,5 +1,19 @@
 # Garmin Assistant (API edition) | Garmin 助手（API）版本
 
+### 打开训练日报（0.2.2）
+
+Windows 安装后，在开始菜单点击 **打开训练日报**；设置窗口内也有同名按钮。
+浏览器会打开本机交互页面。选择长期主项、本次项目和目标，填写当前身体感受，
+点击“保存选择并生成分析”，结果直接显示在页面下方。先在设置中保存自己的 Garmin 密钥。
+命令行安装用户运行 `garmin-assistant dashboard`（macOS/Linux 也使用此命令）。
+分析期间需联网同步 Garmin 和检索文献。页面提供“关闭本次日报服务”按钮。
+日报支持跑步、骑车、游泳、攀岩；骑车、游泳、攀岩先提供保守建议。
+日报偏好独立保存，不会改写旧版 API 距离/时间目标。
+
+The interactive training dashboard runs locally with `garmin-assistant dashboard`.
+Select your primary and session sports, submit your current symptoms, and see results on the page.
+The dashboard engine under `garmin_local` retains its own included license.
+
 ### Local MCP source / 本地 MCP 完整源码
 
 The maintained local MCP source, tests and documentation are available in

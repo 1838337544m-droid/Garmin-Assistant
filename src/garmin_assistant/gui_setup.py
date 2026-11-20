@@ -6,6 +6,7 @@ import sys
 import threading
 import tkinter as tk
 import webbrowser
+from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 from . import __version__
@@ -89,8 +90,15 @@ class SetupWindow:
         buttons=ttk.Frame(self.frame);buttons.pack(fill='x',pady=7)
         self.save_button=ttk.Button(buttons,text=self.text('Save and connect','保存并接入'),command=self.save);self.save_button.pack(side='left')
         self.check_button=ttk.Button(buttons,text=self.text('Save and check Garmin','保存并检查 Garmin'),command=self.check);self.check_button.pack(side='left',padx=8)
+        ttk.Button(buttons,text=self.text('Open training dashboard','打开训练日报'),command=self.open_dashboard).pack(side='left')
         self.output=tk.Text(self.frame,height=8,wrap='word');self.output.pack(fill='both',expand=True)
         self.show(self.text('Save and check Garmin to verify your key independently. Save and connect to configure the selected AI client.','点“保存并检查 Garmin”单独验证密钥。点“保存并接入”配置所选 AI 客户端。'))
+
+    def open_dashboard(self):
+        python=Path(sys.executable)
+        if sys.platform=='win32' and python.with_name('pythonw.exe').exists():
+            python=python.with_name('pythonw.exe')
+        subprocess.Popen([str(python),'-m','garmin_assistant','dashboard'])
 
     def goal_selected(self,use_saved=False):
         sport=self.sport_labels.get(self.goal_choice.get())

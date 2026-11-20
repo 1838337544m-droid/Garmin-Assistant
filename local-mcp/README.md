@@ -49,7 +49,7 @@
 
 - 个人密钥：`D:/garmin/API.txt`（保留原文件，只包含密钥）
 - 缓存和访问令牌：`%LOCALAPPDATA%/GarminLocalMCP/`
-- MCP 配置：`C:/Users/User/.codex/config.toml`
+- MCP 配置：`%USERPROFILE%/.codex/config.toml`
 - 验证报告：本目录 `verification-report.json`（只有状态及大小，没有健康数值或密钥）
 
 密钥文件及缓存目录已设置当前 Windows 用户和 SYSTEM 的访问权限。
@@ -125,6 +125,14 @@ Windows Store Python 可能将该目录映射到 WpSystem 下；程序会解析�
 
 ## 多运动能力处方（2026-11-20）
 
+### 打开交互训练日报
+
+本地环境运行 `python cli.py dashboard`。浏览器自动打开本机页面，
+选择长期主项、本次运动和目标，填写身体感受，点击“保存选择并生成分析”。
+结果直接显示在页面下方；分析时才会同步 Garmin。结束可点击“关闭本次日报服务”。
+网页监听 127.0.0.1 的随机端口，使用每次启动生成的访问令牌，拒绝跨站提交。
+不要分享该页面地址；关闭后再次运行命令即可重新打开。
+
 每次评估会同时生成离线 HTML 日报。多项目结果返回 `report_html` 路径；
 旧跑步报告的同名 `.html` 文件也可直接用浏览器打开。页面包含能力总结、
 数据缺项、研究来源和运动选择区。选择区生成可复制的 MCP 请求，
@@ -173,7 +181,7 @@ codex mcp get garmin_local
 codex mcp remove garmin_local
 ```
 
-首次修改前的配置备份位于 `C:/Users/User/.codex/config.toml.garmin-backup-*`。
+首次修改前的配置备份位于 `%USERPROFILE%/.codex/config.toml.garmin-backup-*`。
 
 参考：
 - https://developer.garmin.com/gc-developer-program/personal/personal-api/
