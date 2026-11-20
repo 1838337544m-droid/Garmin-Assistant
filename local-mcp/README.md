@@ -125,6 +125,11 @@ Windows Store Python 可能将该目录映射到 WpSystem 下；程序会解析�
 
 ## 多运动能力处方（2026-11-20）
 
+每次评估会同时生成离线 HTML 日报。多项目结果返回 `report_html` 路径；
+旧跑步报告的同名 `.html` 文件也可直接用浏览器打开。页面包含能力总结、
+数据缺项、研究来源和运动选择区。选择区生成可复制的 MCP 请求，
+不会在浏览器中自行计算或保存新的处方。页面无需网络字体或外部脚本。
+
 使用 `garmin_set_athlete_profile` 保存长期主项与目标，再调用 `garmin_assess_session`
 选择明天的项目：running、cycling、swimming、climbing 或 other。配置写入本地，
 Garmin 数据工具仍只读。游泳需提供 shoulder_pain=false 和 swimming_alone=false，

@@ -11,6 +11,7 @@ from menu import FUNCTION_MENU
 from athlete_profile import load_profile
 from prescription import build_prescription, classify_activity, SESSION_SPORTS
 from uuid import uuid4
+from report_ui import render_dashboard
 
 
 class TrainingWorkflow:
@@ -45,8 +46,10 @@ class TrainingWorkflow:
         path=self.report_folder/f"session_{result['target_date']}_{sport}_{uuid4().hex}.json"
         path.parent.mkdir(parents=True,exist_ok=True)
         result.update(report_json=str(path),report_markdown=str(path.with_suffix('.md')))
+        result['report_html']=str(path.with_suffix('.html'))
         atomic_json(path,result)
         path.with_suffix('.md').write_text(render_session_report(result),encoding='utf-8')
+        path.with_suffix('.html').write_text(render_dashboard(result),encoding='utf-8')
         return result
 
     def tomorrow(self, as_of=None, subjective=None, planned_km=None, sync_first=True, research_refresh=True, force_research=False, _save=True, _sport=None):
@@ -87,6 +90,7 @@ class TrainingWorkflow:
         result.update({'report_json':str(json_path),'report_markdown':str(markdown_path)})
         atomic_json(json_path,result)
         markdown_path.write_text(render_report(result),encoding='utf-8')
+        markdown_path.with_suffix('.html').write_text(render_dashboard(result),encoding='utf-8')
         return result
 
 
