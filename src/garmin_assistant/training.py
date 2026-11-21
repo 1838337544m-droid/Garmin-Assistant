@@ -9,6 +9,7 @@ from .sync import SyncManager, local_today
 from .menu import core_menu
 from .monitoring import recovery_status, render_monitoring_report, tomorrow_plan, training_status
 from .goals import validate_goal
+from garmin_local.distance_context import distance_context
 from zoneinfo import ZoneInfo
 
 
@@ -93,6 +94,7 @@ class TrainingWorkflow:
                    'checked_on':None,'candidates':[],'error':'Research discovery skipped'})
         result=assess(history,as_of,subjective=subjective,planned_km=planned_km,sync_ok=synced['fresh'],
                       goal=self.settings.goal if self.settings and self.settings.goal_sport == 'running' else None)
+        result['distance_comparison']=distance_context(planned_km,result['metrics']['longest_run_30d_km'],as_of,synced['fresh'])
         result.update({'source':'Garmin official Personal API','sync':synced,'research':evidence,
                        'classic_models':CLASSIC_MODELS,'function_menu':core_menu(),
                        'generated_at':datetime.now(timezone.utc).isoformat()})
@@ -125,6 +127,7 @@ def render_report(r):
     lines=[f"# {r['target_date']} 跑步建议",'',f"数据来源：Garmin；分析日期：{r['as_of']}（{r.get('timezone','UTC')}）。",
            '', f"目标：{r['goal']['distance_km']:g} 公里，{r['goal']['target']}；比赛均速 {r['goal']['race_pace']}。",
            '',f"**结论：{labels[r['decision']]}。**",'',r['recommendation'],
+           '',r.get('distance_comparison',{}).get('display_zh',''),
            '', '这是明日预建议。今晚的睡眠和明天身体状态尚未知，明早同步后需要复评。',
            '', '## 判断线索','']
     lines.extend([f"- {f['reason']}（依据：{f['evidence_id']}）" for f in r['flags']] or ['- 暂未发现已设定的恢复不足线索；这不等于医学放行。'])
@@ -167,6 +170,7 @@ def render_english_report(r):
         f"Source: Garmin. Assessment date: {r['as_of']} ({r.get('timezone','UTC')}).",'',
         f"Goal: {r['goal']['distance_km']:g} km, {r['goal']['target']}. Target race pace: {r['goal']['race_pace']}.",'',
         f"**Decision: {r['decision']}**",'',r['recommendation'],'',
+        r.get('distance_comparison',{}).get('display_en',''),'',
         "This is provisional advice. Tonight's sleep and tomorrow's symptoms are not yet known. Recheck in the morning.",'',
         '## Recovery cues','']
     lines += [f"- {f['reason']} (source: {f['evidence_id']})" for f in r['flags']] or ['- No configured recovery flag was detected; this is not medical clearance.']

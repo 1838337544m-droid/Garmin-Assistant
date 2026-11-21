@@ -12,6 +12,7 @@ from .athlete_profile import load_profile
 from .prescription import build_prescription, classify_activity, SESSION_SPORTS
 from uuid import uuid4
 from .report_ui import render_dashboard
+from .distance_context import distance_context
 
 
 class TrainingWorkflow:
@@ -71,6 +72,8 @@ class TrainingWorkflow:
                   {'status':'reviewed_only','rules_reviewed_on':'2026-10-28','reviewed_sources':REVIEWED,
                    'checked_on':None,'candidates':[],'error':'Research discovery skipped'})
         result=assess(history,as_of,subjective=subjective,planned_km=planned_km,sync_ok=synced['fresh'])
+        if _sport in (None,'running'):
+            result['distance_comparison']=distance_context(planned_km,result['metrics']['longest_run_30d_km'],as_of,synced['fresh'])
         result.update({'source':'Garmin official Personal API','sync':synced,'research':evidence,
                        'classic_models':CLASSIC_MODELS,'function_menu':FUNCTION_MENU,
                        'generated_at':datetime.now(timezone.utc).isoformat()})
@@ -97,7 +100,8 @@ class TrainingWorkflow:
 def render_session_report(r):
     p=r['prescription']
     lines=[f"# {r['target_date']} 明日训练处方",'',f"长期主项：{r['primary_sport']} · 本次项目：{r['session_sport']}",
-           f"目标：{r['goal']}",'',p['session_action'],p['dose'],'','## 能力处方总结',
+           f"目标：{r['goal']}",'',p['session_action'],p['dose'],
+           r.get('distance_comparison',{}).get('display_zh',''),'','## 能力处方总结',
            p['capacity_summary'],p['capacity_focus'],'','## 处方依据',
            *[f"- {f['reason']}" for f in r['flags']],
            f"数据来源：Garmin；分析日期：{r['as_of']}（Asia/Dubai）；同步状态：{r['sync'].get('status','未知')}。",
@@ -126,6 +130,7 @@ def render_report(r):
     lines=[f"# {r['target_date']} 跑步建议",'',f"数据来源：Garmin；分析日期：{r['as_of']}（Asia/Dubai）。",
            '', '目标：10 公里跑进 60 分钟；比赛均速需略快于 6:00/km。',
            '',f"**结论：{labels[r['decision']]}。**",'',r['recommendation'],
+           '',r.get('distance_comparison',{}).get('display_zh',''),
            '', '这是明日预建议。今晚的睡眠和明天身体状态尚未知，明早同步后需要复评。',
            '', '## 判断线索','']
     lines.extend([f"- {f['reason']}（依据：{f['evidence_id']}）" for f in r['flags']] or ['- 暂未发现已设定的恢复不足线索；这不等于医学放行。'])
