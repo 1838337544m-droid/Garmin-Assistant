@@ -29,7 +29,7 @@ def test_deepseek_round_trip_uses_real_mcp_menu_and_blocks_unknown_tools(monkeyp
         else:
             menu, blocked = body['messages'][-2:]
             assert menu['tool_call_id'] == 'menu'
-            assert [item['id'] for item in json.loads(menu['content'])['function_menu']] == list(range(1, 5))
+            assert [item['id'] for item in json.loads(menu['content'])['function_menu']] == list(range(1, 6))
             assert 'unavailable' in blocked['content']
             message = {'content': 'Here is the Garmin menu.'}
         return httpx.Response(200, json={'choices': [{'message': message}]})

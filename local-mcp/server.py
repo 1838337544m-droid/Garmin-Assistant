@@ -26,6 +26,7 @@ training = TrainingWorkflow(service, DATA, report_folder=ROOT.parent/'reports')
 READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=True)
 LOCAL_WRITE = ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=False)
 mcp = FastMCP('garmin_local', instructions=(
+    'When the user says 打开训练日报 or open training dashboard, call garmin_open_training_dashboard. Open the interactive browser page; do not substitute a Markdown file or Notepad. Opening the page does not sync or analyze data. Explain: choose sports and goal, enter symptoms (unknown may remain blank), click 保存选择并生成分析 and view results below. '
     'For every Garmin health/training analysis, first fill the interval since the previous successful sync using garmin_sync_data; garmin_assess_tomorrow already does this. '
     'If last literature search is >=7 days old, refresh research before advice; never claim latest evidence if refresh fails. '
     'Combine applicable current running/recovery evidence with cited classic models. Assess candidate abstracts before using their findings; do not automatically treat them as reviewed rules. '
@@ -61,7 +62,10 @@ def garmin_open_training_dashboard() -> dict:
     if os.name=='nt' and executable.with_name('pythonw.exe').exists():
         executable=executable.with_name('pythonw.exe')
     subprocess.Popen([str(executable),str(ROOT/'cli.py'),'dashboard'],cwd=str(ROOT))
-    return {'launched':True}
+    return {'launched':True,'data_synced':False,'analysis_generated':False,
+            'message':'已请求打开浏览器训练日报。',
+            'next_steps':['选择长期主项、本次运动和目标','填写身体感受，不确定可留空',
+                          '点击“保存选择并生成分析”，在页面下方看结果']}
 
 
 @mcp.tool(annotations=READ_ONLY)

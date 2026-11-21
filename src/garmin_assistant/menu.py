@@ -30,6 +30,7 @@ PRIMARY_FUNCTIONS=(
     CoreFunction(2,'截至目前训练效果与状态','查看近 30 天常做项目、频次和训练数据，以及近 90 天的身体指标。','garmin_training_status'),
     CoreFunction(3,'疲劳与恢复','结合个人指标趋势、主观疲劳和酸痛，以及近期训练量。','garmin_recovery_status'),
     CoreFunction(4,'明天运动建议','选择游泳、自行车或跑步，再提供目标距离和时间。','garmin_plan_tomorrow'),
+    CoreFunction(5,'打开训练日报（网页）','在浏览器选择运动、填写身体感受并生成分析；无需查找报告文件。','garmin_open_training_dashboard'),
 )
 RESTORE_COMMAND='显示原有功能菜单'
 

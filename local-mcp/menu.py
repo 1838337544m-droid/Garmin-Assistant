@@ -1,6 +1,7 @@
 # Copyright (c) 2026 1838337544m-droid. All rights reserved.
 """User-facing actions supported by this local MCP installation."""
 FUNCTION_MENU = [
+    {'command':'打开训练日报（网页）','description':'在浏览器选运动、填身体感受、点击生成分析，结果直接显示。','tool':'garmin_open_training_dashboard'},
     {'command':'设置长期运动主项与目标','description':'本地保存跑步、骑车、游泳或攀岩偏好；不修改 Garmin 数据。','tool':'garmin_get_athlete_profile / garmin_set_athlete_profile'},
     {'command':'生成明日专项处方','description':'按长期主项和本次运动给出能力总结、恢复边界与明早复评提示。','tool':'garmin_assess_session'},
     {'command':'同步数据','description':'补齐上次同步后至今的数据，重查重叠日期并报告缺失项。','tool':'garmin_sync_data'},

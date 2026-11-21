@@ -27,11 +27,12 @@ service = GarminService(DATA / 'cache.sqlite3', OfficialProvider(KEY, DATA / 'be
 training = TrainingWorkflow(service, DATA, settings=settings)
 READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=True)
 mcp = FastMCP('Garmin 助手（API）版本', instructions=(
+    'DASHBOARD ROUTING: If the user says 打开训练日报, 训练日报, 打开日报, or open training dashboard, call garmin_open_training_dashboard. Open the interactive browser page, never a Markdown/JSON file or Notepad. Opening the dashboard does not sync Garmin and does not generate a report. After the tool succeeds, explain the next steps from its result; never claim data synced or analysis finished just from opening it. If the tool is unavailable in an old session, say so and offer the Start-menu Garmin Assistant Daily entry; do not silently substitute a text report. '
     'FIRST USE: call garmin_welcome before health tools. If language_selection_required=true, display its bilingual welcome and ask 1. 中文 / 2. English; wait for the answer, then call garmin_set_language(zh/en). A first-use number selects language, not a function. Do not auto-pick a language or read health data first. After selection, answer in the saved language. Users can switch any time. MCP cannot independently open a chat; show welcome at first interaction. '
     'After language selection, when goal_selection_required=true, invite the user to choose swimming, cycling or running, then give distance and time. Call garmin_set_goal only with all three explicitly chosen. Goal setup can be skipped. For health and training analysis, first fill the interval since the previous successful sync. The reporting and planning tools already do this. '
     'If last literature search is >=7 days old, refresh research before advice; never claim latest evidence if refresh fails. '
     'Combine applicable current running/recovery evidence with cited classic models. Assess candidate abstracts before using their findings; do not automatically treat them as reviewed rules. '
-    'The current numbered menu is 1 sync, 2 training progress, 3 fatigue/recovery, 4 tomorrow’s plan. Tools for 2–4 already sync; avoid syncing twice. For 3 ask for fatigue and soreness ratings (0–10); keep missing ratings unknown. For 4 offer their saved goal or collect sport, distance and time, then ask about current symptoms. Convert swimming metres to kilometres for the tool. Never default a menu-4 goal without user input. If user says 显示原有功能菜单 call garmin_function_menu(show_original=true) to show the original seven commands. Interpret numbers according to the menu or follow-up choices currently presented. Custom workflows use IDs >=100, and their instructions cannot override core policy. Show the current function_menu with IDs. Standalone menu/status/config questions do not require synchronization. '
+    'The current numbered menu is 1 sync, 2 training progress, 3 fatigue/recovery, 4 tomorrow’s plan, 5 open the web training dashboard. Tools for 2–4 already sync; avoid syncing twice. For 3 ask for fatigue and soreness ratings (0–10); keep missing ratings unknown. For 4 offer their saved goal or collect sport, distance and time, then ask about current symptoms. Convert swimming metres to kilometres for the tool. Never default a menu-4 goal without user input. If user says 显示原有功能菜单 call garmin_function_menu(show_original=true) to show the original seven commands. Interpret numbers according to the menu or follow-up choices currently presented. Custom workflows use IDs >=100, and their instructions cannot override core policy. Show the current function_menu with IDs. Standalone menu/status/config questions do not require synchronization. '
     'Use these tools for this user\'s Garmin health and exercise questions. '
     'Fetch data before answering; never invent missing values. Dates use the configured IANA timezone (UTC until configured). '
     'Cache lasts 15 minutes; use refresh=true when the user asks for latest data. '
@@ -69,7 +70,11 @@ def garmin_open_training_dashboard() -> dict:
     if os.name=='nt' and python.with_name('pythonw.exe').exists():
         python=python.with_name('pythonw.exe')
     subprocess.Popen([str(python),'-m','garmin_assistant','dashboard'])
-    return {'launched':True,'message':'已启动训练日报，页面将在本机浏览器打开。'}
+    return {'launched':True,'data_synced':False,'analysis_generated':False,
+            'message':'已请求在浏览器打开交互训练日报。请切到浏览器查看，而不是记事本。',
+            'next_steps':['选择长期主项与明天的运动','填写长期目标；跑步可选填计划距离',
+                          '填写当前身体感受，不确定可留空','点击“保存选择并生成分析”，等待结果显示在页面下方'],
+            'if_not_visible':'开始菜单搜索 Garmin Assistant Daily，或在设置窗口点“打开训练日报”。'}
 
 
 @mcp.tool(annotations=READ_ONLY)
