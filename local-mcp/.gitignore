@@ -9,3 +9,5 @@ docs/upstream-auth.txt
 .env
 .env.*
 .worktrees/
+athlete_profile.json
+dashboard-defaults.json
