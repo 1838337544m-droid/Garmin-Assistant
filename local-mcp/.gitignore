@@ -11,3 +11,4 @@ docs/upstream-auth.txt
 .worktrees/
 athlete_profile.json
 dashboard-defaults.json
+latest-dashboard.json

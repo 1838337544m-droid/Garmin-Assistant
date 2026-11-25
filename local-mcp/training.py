@@ -53,12 +53,13 @@ class TrainingWorkflow:
         path.with_suffix('.html').write_text(render_dashboard(result),encoding='utf-8')
         return result
 
-    def tomorrow(self, as_of=None, subjective=None, planned_km=None, sync_first=True, research_refresh=True, force_research=False, _save=True, _sport=None):
+    def tomorrow(self, as_of=None, subjective=None, planned_km=None, sync_first=True, research_refresh=True, force_research=False, _save=True, _sport=None, progress=None):
         as_of=as_of or local_today()
         if date.fromisoformat(as_of).isoformat()!=as_of or as_of>local_today():
             raise ValueError('as_of must be a valid nonfuture YYYY-MM-DD')
         if sync_first:
             if as_of!=local_today():raise ValueError('Historical analysis must use sync_first=False')
+            if progress: progress('syncing')
             synced=self.sync()
             synced={**synced,'fresh':synced['status']=='ok'}
         else:
@@ -68,9 +69,11 @@ class TrainingWorkflow:
         if _sport and _sport!='running':
             history={**history,'activities':[]}
         # Optional offline path never checks PubMed.
+        if progress: progress('research')
         evidence=(update_research(self.folder,as_of,force=force_research) if research_refresh else
                   {'status':'reviewed_only','rules_reviewed_on':'2026-10-28','reviewed_sources':REVIEWED,
                    'checked_on':None,'candidates':[],'error':'Research discovery skipped'})
+        if progress: progress('analyzing')
         result=assess(history,as_of,subjective=subjective,planned_km=planned_km,sync_ok=synced['fresh'])
         if _sport in (None,'running'):
             result['distance_comparison']=distance_context(planned_km,result['metrics']['longest_run_30d_km'],as_of,synced['fresh'])
