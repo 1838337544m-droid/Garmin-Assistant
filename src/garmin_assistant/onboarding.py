@@ -11,7 +11,7 @@ def welcome(settings=None):
     settings=settings or load_settings()
     required=settings.language is None
     return {'language':settings.language,'language_selection_required':required,
-            'message':WELCOME_TEXT if required else ('欢迎回来。想直接使用新界面，请说“打开训练日报”或选择菜单5。页面打开后：选运动和目标 → 填身体感受（不确定可留空）→ 点“保存选择并生成分析” → 在下方看结果。' if settings.language=='zh' else 'Welcome back. Say "Open training dashboard" or choose menu 5. Select sports and a goal, enter symptoms, then submit to see results on the page.'),
+            'message':WELCOME_TEXT if required else ('欢迎回来。想直接使用新界面，请说“打开训练日报”或选择菜单5。页面打开后：选运动和目标 → 填身体感受（不确定可留空）→ 点“更新分析”生成分析 → 在下方看结果。' if settings.language=='zh' else 'Welcome back. Say "Open training dashboard" or choose menu 5. Select sports and a goal, enter symptoms, then submit to see results on the page.'),
             'choices':[{'id':1,'label':'中文','language':'zh'},{'id':2,'label':'English','language':'en'}],
             'goal': settings.goal if not required else None,
             'goal_selection_required': not required and settings.goal is None,

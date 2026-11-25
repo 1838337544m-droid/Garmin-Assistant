@@ -72,8 +72,9 @@ def garmin_open_training_dashboard() -> dict:
     subprocess.Popen([str(python),'-m','garmin_assistant','dashboard'])
     return {'launched':True,'data_synced':False,'analysis_generated':False,
             'message':'已请求在浏览器打开交互训练日报。请切到浏览器查看，而不是记事本。',
-            'next_steps':['选择长期主项与明天的运动','填写长期目标；跑步可选填计划距离',
-                          '填写当前身体感受，不确定可留空','点击“保存选择并生成分析”，等待结果显示在页面下方'],
+            'next_steps':['先查看上次结果和日期；没有记录时按首次使用指引设置',
+                          '点击“更新分析”，查看同步进度和数据缺项',
+                          '已保存的目标、运动和身体感受有变化时再展开修改'],
             'if_not_visible':'开始菜单搜索 Garmin Assistant Daily，或在设置窗口点“打开训练日报”。'}
 
 

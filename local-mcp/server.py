@@ -64,8 +64,8 @@ def garmin_open_training_dashboard() -> dict:
     subprocess.Popen([str(executable),str(ROOT/'cli.py'),'dashboard'],cwd=str(ROOT))
     return {'launched':True,'data_synced':False,'analysis_generated':False,
             'message':'已请求打开浏览器训练日报。',
-            'next_steps':['选择长期主项、本次运动和目标','填写身体感受，不确定可留空',
-                          '点击“保存选择并生成分析”，在页面下方看结果']}
+            'next_steps':['先查看上次结果和日期','需要刷新时点击“更新分析”',
+                          '运动、目标或身体感受有变化时再展开修改']}
 
 
 @mcp.tool(annotations=READ_ONLY)
