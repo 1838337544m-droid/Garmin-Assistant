@@ -1,5 +1,8 @@
 # Copyright (c) 2026 1838337544m-droid. All rights reserved.
 """Conservative, explainable multisport next-day prescription templates."""
+from .session_targets import session_targets
+
+SPORT_LABELS = {'running':'跑步','cycling':'骑车','swimming':'游泳','climbing':'攀岩'}
 
 SESSION_SPORTS = {'running', 'cycling', 'swimming', 'climbing', 'other'}
 ACTIVITY_KEYS = {
@@ -38,8 +41,8 @@ def build_prescription(profile, session_sport, safety, activities, session_inten
     action = {'running': '轻松跑，保持完整交谈。', 'cycling': '轻松转腿骑行，保持完整交谈。',
               'swimming': '轻松技术游，不追求速度。', 'climbing': '低强度技术攀爬，避免极限抓点。'}[session_sport]
     cross = session_sport != primary
-    summary = (f'{session_sport} 作为交叉训练，需结合长期{primary}目标确认作用，不换算专项负荷。' if cross
-               else f'今天以{primary}项目维持基础能力。')
+    summary = (f'{SPORT_LABELS[session_sport]}作为交叉训练，需结合长期{SPORT_LABELS[primary]}目标确认作用，不换算专项负荷。' if cross
+               else f'本次以{SPORT_LABELS[primary]}维持基础能力。')
     boundary = ('Garmin 数据不能确认指力、肌腱或皮肤准备度。' if session_sport == 'climbing'
                 else '可穿戴数据不能替代症状检查或专项技术判断。')
     focus={'running':'维持有氧基础与跑步组织耐受。','cycling':'维持低强度有氧与踏频控制。',
@@ -48,5 +51,7 @@ def build_prescription(profile, session_sport, safety, activities, session_inten
             'session_action': action, 'capacity_focus': focus,
             'same_sport_sessions':sum(classify_activity(a)==session_sport for a in activities),
             'capacity_summary': summary, 'dose': 'RPE 2–3/10；不安排专项高强度。',
+            'session_targets': session_targets(session_sport, profile.get('goal',''),
+                profile.get('sport_targets',{}).get(session_sport,{}), safety.get('suggested_easy_minutes')),
             'downgrade_rule': '热身或过程中出现疼痛、异常疲劳或不适时停止并改为恢复。',
             'evidence_boundary': boundary}

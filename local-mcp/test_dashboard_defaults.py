@@ -29,3 +29,12 @@ def test_editing_one_field_does_not_refresh_other_old_fields(tmp_path):
     edited={**body,'subjective':{'pain_0_10':0,'fatigue_0_10':5}}
     _,current,_=save_defaults(tmp_path,edited,now+timedelta(days=2))
     assert current=={'fatigue_0_10':5}
+
+
+def test_sport_quantities_and_race_remain_saved_without_retyping(tmp_path):
+    body={'session_sport':'running','sport_targets':{'running':{'hr_low':120,'hr_high':140}},
+          'race_plan':{'enabled':True,'name':'10K','sport':'running','date':'2026-12-01','distance_km':10}}
+    save_defaults(tmp_path,body)
+    again,_,_=save_defaults(tmp_path,{'session_sport':'cycling'})
+    assert again['sport_targets']==body['sport_targets']
+    assert again['race_plan']==body['race_plan']

@@ -1,3 +1,3 @@
 """Garmin 助手（API）版本."""
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 TITLE = "Garmin 助手（API）版本"

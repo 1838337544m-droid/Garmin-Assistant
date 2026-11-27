@@ -13,6 +13,8 @@ from prescription import build_prescription, classify_activity, SESSION_SPORTS
 from uuid import uuid4
 from report_ui import render_dashboard
 from distance_context import distance_context
+from dashboard_defaults import load_defaults
+from session_targets import race_context
 
 
 class TrainingWorkflow:
@@ -29,6 +31,8 @@ class TrainingWorkflow:
         profile=load_profile(self.folder)
         if not profile:
             raise ValueError('Set a primary sport profile before requesting a multisport prescription.')
+        defaults=load_defaults(self.folder)
+        profile={**profile,'sport_targets':defaults.get('sport_targets',{})}
         sport=session_sport or profile['primary_sport']
         if sport not in SESSION_SPORTS or session_intent not in {None,'recovery','base','quality','skills'}:
             raise ValueError('Unsupported sport or intent')
@@ -39,6 +43,7 @@ class TrainingWorkflow:
                                                          session_intent,swimming_safety)})
         result.update(schema_version=1,session_intent=session_intent,
                       profile_effective_at=profile['profile_effective_at'],goal=profile['goal'])
+        result['race_context']=race_context(defaults.get('race_plan'),sport,result['target_date'],result.get('metrics'))
         for key in ('model_application','classic_models','training_logic','suggested_easy_minutes'):
             result.pop(key,None)
         result['recommendation']=result['prescription']['session_action']
@@ -105,7 +110,11 @@ def render_session_report(r):
     lines=[f"# {r['target_date']} 明日训练处方",'',f"长期主项：{r['primary_sport']} · 本次项目：{r['session_sport']}",
            f"目标：{r['goal']}",'',p['session_action'],p['dose'],
            r.get('distance_comparison',{}).get('display_zh',''),'','## 能力处方总结',
-           p['capacity_summary'],p['capacity_focus'],'','## 处方依据',
+           p['capacity_summary'],p['capacity_focus'],'','## 专项执行指标',
+           *[f'- {label}：{value}' for label,value in p.get('session_targets',[])],
+           '数值来源：个人保存的轻松训练区间与算术换算；不是生理阈值测定。未设置的项目不编造数值。',
+           '','## 比赛计划与综合分析',*[f'- {label}：{value}' for label,value in r.get('race_context',[])],
+           '','## 处方依据',
            *[f"- {f['reason']}" for f in r['flags']],
            f"数据来源：Garmin；分析日期：{r['as_of']}（Asia/Dubai）；同步状态：{r['sync'].get('status','未知')}。",
            '','## 未知与安全边界',f"缺项：{', '.join(r['missing']) or '无已知缺项'}",p['evidence_boundary'],
