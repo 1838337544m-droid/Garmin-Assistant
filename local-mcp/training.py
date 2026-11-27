@@ -15,6 +15,7 @@ from report_ui import render_dashboard
 from distance_context import distance_context
 from dashboard_defaults import load_defaults
 from session_targets import race_context
+from goal_guidance import build_goal_guidance
 
 
 class TrainingWorkflow:
@@ -44,6 +45,7 @@ class TrainingWorkflow:
         result.update(schema_version=1,session_intent=session_intent,
                       profile_effective_at=profile['profile_effective_at'],goal=profile['goal'])
         result['race_context']=race_context(defaults.get('race_plan'),sport,result['target_date'],result.get('metrics'))
+        result['goal_guidance']=build_goal_guidance(profile,sport,defaults,result,history.get('activities',[]))
         for key in ('model_application','classic_models','training_logic','suggested_easy_minutes'):
             result.pop(key,None)
         result['recommendation']=result['prescription']['session_action']
@@ -124,6 +126,15 @@ def render_session_report(r):
            '现有检索主要覆盖跑步与恢复；骑车、游泳、攀岩专项剂量尚未核验，因此仅提供保守活动方向，不推断专项能力。',
            f"规则来源核验日期：{r['research'].get('rules_reviewed_on')}；候选论文不自动成为规则。"]
     lines.extend(f"- [{s['title']}]({s['url']})（{s['year']}，仅作为恢复背景）" for s in r['research']['reviewed_sources'])
+    guidance=r.get('goal_guidance',{})
+    for index,section in enumerate(guidance.get('priorities',[])):
+        lines.extend(['','## '+section['title'],*[f'- {label}：{value}' for label,value in section['items']]])
+        if index==0 and guidance.get('week_plan'):
+            lines.extend(['','### 7日条件性训练安排',guidance['method'],
+                *[f'- {row["date"]}：{row["action"]}' for row in guidance['week_plan']]])
+    if guidance:
+        lines.extend(['','## 指导依据与适用范围',guidance['evidence_scope']])
+        lines.extend(f'- [{s["title"]}]({s["url"]})（发表/版次日期：{s["date"]}；核对：{s["checked_on"]}）。{s["quality"]} {s["application"]}' for s in guidance['sources'])
     return '\n\n'.join(lines)+'\n'
 
 

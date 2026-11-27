@@ -38,3 +38,12 @@ def test_sport_quantities_and_race_remain_saved_without_retyping(tmp_path):
     again,_,_=save_defaults(tmp_path,{'session_sport':'cycling'})
     assert again['sport_targets']==body['sport_targets']
     assert again['race_plan']==body['race_plan']
+
+
+def test_explicit_test_result_is_remembered_and_can_be_cleared(tmp_path):
+    benchmark={'date':'2026-11-20','kind':'race','distance_km':10,'time_minutes':55}
+    save_defaults(tmp_path,{'session_sport':'running','running_benchmark':benchmark})
+    again,_,_=save_defaults(tmp_path,{'session_sport':'running'})
+    assert again['running_benchmark']==benchmark
+    cleared,_,_=save_defaults(tmp_path,{'session_sport':'running','running_benchmark':None})
+    assert cleared['running_benchmark'] is None

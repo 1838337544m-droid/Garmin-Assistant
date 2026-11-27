@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timezone, timedelta
 from .research import atomic_json
 from .session_targets import validate_targets, validate_race
+from .goal_guidance import validate_benchmark
 
 
 def load_defaults(folder):
@@ -21,6 +22,7 @@ def save_defaults(folder,body,now=None):
     previous=load_defaults(folder)
     targets=validate_targets(body.get('sport_targets',previous.get('sport_targets',{})))
     race=validate_race(body.get('race_plan',previous.get('race_plan')))
+    benchmark=validate_benchmark(body.get('running_benchmark',previous.get('running_benchmark')))
     subjective=body.get('subjective',{})
     swim=body.get('swimming_safety',{})
     stamps={}
@@ -41,6 +43,7 @@ def save_defaults(folder,body,now=None):
     value={'session_sport':body['session_sport'],'planned_km':body.get('planned_km'),
            'sport_targets':targets,
            'race_plan':race,
+           'running_benchmark':benchmark,
            'subjective':subjective,'swimming_safety':swim,'state_recorded_at':stamp,'field_recorded_at':stamps}
     atomic_json(folder/'dashboard-defaults.json',value)
     return value,current['subjective'],current['swimming_safety']
